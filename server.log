@@ -1,0 +1,3 @@
+{"level":"info","message":"HTTP listening on *:6101","timestamp":"2015-07-13T18:12:36.694Z"}
+{"level":"info","message":"TCP  listening on *:6100","timestamp":"2015-07-13T18:12:36.695Z"}
+{"level":"info","message":"socket.io connected","timestamp":"2015-07-13T18:12:38.218Z"}

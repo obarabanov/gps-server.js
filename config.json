@@ -1,0 +1,21 @@
+{
+    "tcp": {
+        "port": 6100
+    },
+    
+    "http": {
+        "port": 6101
+    },
+
+    "db": {
+      "host"     : "192.174.25.50",
+      "port"     : 3306,
+      "database" : "shels",
+      "user"     : "sergio",
+      "password" : "gis25gEo15For"
+    },
+
+    "socketio": {
+    }
+
+}
