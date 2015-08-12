@@ -1,6 +1,34 @@
 
 var map = L.map('map').setView([48.60, 31.40], 6);//12);
 
+var iconCar;
+//iconCar = L.divIcon({className: 'leaflet-div-icon'});
+//iconCar = L.divIcon({className: 'glyphicon glyphicon-phone'}); // works, but small
+
+iconCar = L.icon({
+    //iconUrl: 'car211_128x128.png'
+    //iconUrl: 'car211_24x24.png'
+    iconUrl: 'car211_64x64.png',
+    //iconSize: [64, 64],
+    //popupAnchor: [-2, -12],
+    //popupAnchor: [-2, -12],
+    iconSize: [48, 48],
+    popupAnchor: [-2, -8],
+    iconAnchor: [24, 24]
+    /*
+    @see http://leafletjs.com/reference.html#icon
+    iconUrl: 'my-icon.png',
+    iconRetinaUrl: 'my-icon@2x.png',
+    iconSize: [38, 95],
+    iconAnchor: [22, 94],
+    popupAnchor: [-3, -76],
+    shadowUrl: 'my-icon-shadow.png',
+    shadowRetinaUrl: 'my-icon-shadow@2x.png',
+    shadowSize: [68, 95],
+    shadowAnchor: [22, 94]
+    */
+});
+
 var mapDevices = [];
 
 var socket = io();
@@ -73,7 +101,7 @@ socket.on('map message', function (msg) {
  */
 function setMarker( msg, opacity ) 
 {
-    var marker = L.marker( [msg.lat, msg.lng], {opacity: (opacity) ? opacity : 1.0} ).addTo(map);
+    var marker = L.marker( [msg.lat, msg.lng], { icon: iconCar, opacity: (opacity) ? opacity : 1.0 } ).addTo(map);
     msg['objMarker'] = marker; // keep marker object
     
     var info;

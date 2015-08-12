@@ -8,13 +8,21 @@
     },
 
     "db": {
-      "host"     : "192.174.25.50",
+      "host"     : "localhost",
       "port"     : 3306,
       "database" : "shels",
-      "user"     : "sergio",
-      "password" : "gis25gEo15For"
+      "user"     : "test",
+      "password" : "test"
     },
 
+    "db_dev": {
+      "host"     : "localhost",
+      "port"     : 3306,
+      "database" : "gis_tracking",
+      "user"     : "root",
+      "password" : ""
+    },
+    
     "socketio": {
     }
 
