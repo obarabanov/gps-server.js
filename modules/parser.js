@@ -44,7 +44,7 @@ parser.parse = function (buffer)
     var vendor = parser.detectVendor(data);
 
     if (vendor == 'IMEI') {
-        return parser.checkIMEI(data);
+        return parser.parseIMEI(data);
     } else if (vendor == 'GlobalSat') {
         return parser.parseGlobalSat(data);
     } else if (data.length > 17) {
@@ -215,10 +215,9 @@ parser.ensureUtc = function (strDate, strTime)
 };
 
 // --- BiTrek GPS ------------------------------------------------------------
-parser.checkIMEI = function (data) {
+parser.parseIMEI = function (data) {
     if (data.length > 15) {
         data = data.substr(2);
-		parser.IMEI = data;
 	}
     return data;
 };

@@ -80,7 +80,7 @@ var tcp = net.createServer( function(socket) {
     var client = 'host ' + socket.remoteAddress + ':' + socket.remotePort;
     log.info('TCP  connected ' + client);
     
-    //	works without it, for String packets too.
+    //	no need, date should be kept as Buffer (binary).
 	//socket.setEncoding('utf8'); // to convert Buffer -> String
     
     tcp.getConnections(function(err, count) {
@@ -126,7 +126,7 @@ var tcp = net.createServer( function(socket) {
         //socket.write('echoing: ' + data); // tested - ok !
 		
         /*
-        //  TODO:   why ??
+        //  TODO:   why ?? remove these..
         if (data == 'exit\n') {
             log.info('exit command received: ' + socket.remoteAddress + ':' + socket.remotePort + '\n');
             socket.destroy();
@@ -134,30 +134,34 @@ var tcp = net.createServer( function(socket) {
         */
         
         //  process data
-        var parsedMaps = parser.parse(data); // data instanceof Buffer == true
-  		log.debug( 'tcp parsed data:\n' + parsedMaps);
+        var parsedData = parser.parse(data); // (data instanceof Buffer) == true
+  		log.debug( 'parsed data:\n' + parsedData);
 		
-		/*
-        if (parsedMaps == null) {
-            //socket.write( 0);
-            //socket.end();
-        }
-        */
+        if (!parsedData) {	//	null || undefined
+			log.error( "Data wasn't parsed. Procession stopped." );
+			
+			/*
+			//	TODO:	is this required ?
+			if (parsedData == null) {
+				//socket.write( 0);
+				//socket.end();
+			}
+			*/
 	   
-        if (!parsedMaps) {
-			log.error( "Data wasn't parsed." );
 			return;
         }
 		
+		//	check if this is IMEI packet
         //if ((parsedMaps) && !(parsedMaps instanceof Array)) {
-        if (!(parsedMaps instanceof Array)) {
-            db.checkIMEI(socket, parsedMaps);
+        if (_.isString(parsedData)) {
 			
 			//	TODO:	
 			//	
 			//	#1	mark socket with IMEI id.
-			//	
-			//	#2	re-factor:	depending on checkIMEI() result, write to socket here (in callback).
+			//	#2	check IMEI in DB.
+			//	#3	re-factor:	depending on checkIMEI() result, write to socket here (in callback).
+		
+            db.checkIMEI(socket, parsedData);
 			
 			return;
 			
@@ -175,8 +179,16 @@ var tcp = net.createServer( function(socket) {
              }
              */
         }
-            
-		//if (parsedMaps != null && (parsedMaps instanceof Array)) { }
+		
+        var parsedMaps;
+        if (_.isArray(parsedData)) {
+			parsedMaps = parsedData;
+		}
+		
+		if (!parsedMaps) {
+			log.error('Wrong parsed data format. Procession stopped.');
+			return;
+		}
 			
 		for (var index in parsedMaps) // this approach is safe, in case parsedMaps == null.
 		{
