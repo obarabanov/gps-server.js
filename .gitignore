@@ -1,0 +1,7 @@
+!.gitkeep
+node_modules/
+bower_components/
+/nbproject/private/
+logs/*
+*.log
+
