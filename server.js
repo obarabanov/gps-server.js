@@ -82,7 +82,8 @@ var tcp = net.createServer( function(socket) {
     var client = 'host ' + socket.remoteAddress + ':' + socket.remotePort;
     log.info('TCP  connected ' + client);
     
-    //socket.setEncoding('utf8'); // to convert Buffer -> String
+    //	works without it, for String packets too.
+	//socket.setEncoding('utf8'); // to convert Buffer -> String
     
     tcp.getConnections(function(err, count) {
         if (err) {
@@ -102,6 +103,7 @@ var tcp = net.createServer( function(socket) {
         socket.destroy();
     }, 20000);	
     */
+   
 	/*
     //socket.write('Welcome to the Telnet server!\n');
     socket.on('connect', function() {
@@ -114,16 +116,17 @@ var tcp = net.createServer( function(socket) {
         });		
     });
     */
-    socket.on('data', function(data) {
-        
-        //console.log('tcp ' + client + '  passed data:\n' + data );
+
+    socket.on('data', function(data) 
+	{
         log.info( 'tcp ' + client + '  passed data:\n' + data );
         logInput.info( '' + data );
-        //socket.write('echoing: ' + data); // tested - ok !
-        
+		
         //log.debug( 'is data of String type ? ' + _.isString(data) );
         //log.debug( 'data instanceof Buffer ? ' + (data instanceof Buffer) );
 	
+        //socket.write('echoing: ' + data); // tested - ok !
+		
         /*
         //  TODO:   why ??
         if (data == 'exit\n') {
@@ -134,15 +137,32 @@ var tcp = net.createServer( function(socket) {
         
         //  process data
         var parsedMaps = parser.parse(data); // Buffer of data
-  		log.info( 'tcp parsed data:\n' + parsedMaps);
+  		log.debug( 'tcp parsed data:\n' + parsedMaps);
 		
+		/*
         if (parsedMaps == null) {
             //socket.write( 0);
             //socket.end();
         }
-        
-        if (parsedMaps != null && !(parsedMaps instanceof Array)) {
+        */
+	   
+        if (!parsedMaps) {
+			log.error( "Data wasn't parsed." );
+			return;
+        }
+		
+        //if ((parsedMaps) && !(parsedMaps instanceof Array)) {
+        if (!(parsedMaps instanceof Array)) {
             db.checkIMEI(socket, parsedMaps);
+			
+			//	TODO:	
+			//	
+			//	#1	mark socket with IMEI id.
+			//	
+			//	#2	re-factor:	depending on checkIMEI() result, write to socket here (in callback).
+			
+			return;
+			
             /*
              if (checkIMEI( parsedMaps) == 1) {
              //socket.write( "1");//String.fromCharCode(01));//'\u0001'.charCodeAt(0));
@@ -158,69 +178,69 @@ var tcp = net.createServer( function(socket) {
              */
         }
             
-		if (parsedMaps != null && (parsedMaps instanceof Array)) {
-			for (var index in parsedMaps) // this approach is safe, in case parsedMaps == null.
-			{
-				var mapData = parsedMaps[ index ];
-				//console.log( mapData, clients[ socket.remoteAddress]);
-				var number = mapData['IMEI']; 
-				
-				if (number) {
-					//  utcDate,utcTime
-					//var utcDate = mapData['utcDate'];
-					//var utcTime = mapData['utcTime'];
-					//var utcDate = new Date(mapData['utcDate']);
-					//var utcTime = new Date(mapData['utcTime']);
-					//var utcDateTime = new Date(parseInt(mapData['utcDate']) + parseInt(mapData['utcTime']));
-					//log.debug('date: ' + utcDate + ' time: ' + utcTime);
+		//if (parsedMaps != null && (parsedMaps instanceof Array)) { }
+			
+		for (var index in parsedMaps) // this approach is safe, in case parsedMaps == null.
+		{
+			var mapData = parsedMaps[ index ];
+			//console.log( mapData, clients[ socket.remoteAddress]);
+			var number = mapData['IMEI']; 
 
-					//log.debug('date & time as Date: ' + utcDateTime); // OUTPUT: date & time as Date: 1377818379000
-					//log.debug('date&time as String: ' + utcDateTime.toString()); // the same !
-					
-					var utcDateTime = mapData['utcDateTime'];
-					var lat = mapData['latitude'];
-					var lng = mapData['longitude'];
-				
-					//  TODO:   verify checksum
-					var objUI = {
-						type: 'marker', 
-						deviceId: number,
-						//utcDate: utcDate,
-						//utcTime: utcTime,
-						utcDateTime: new Date( utcDateTime).toUTCString(),
-						altitude: mapData['altitude'], // Unit: meter
-						speed: mapData['speedKnots'], // unit: km/hr
-						heading: mapData['heading'], // unit: degree
-						//reportType: mapData['reportType'], - see: tr-600_development_document_v0_7.pdf -> //4=Motion mode static report //5 = Motion mode moving report //I=SOS alarm report //j= ACC report
-						lat: lat, 
-						lng: lng
-					};            
-					io.emit( 'map message', objUI ); // broadcasting using 'emit' to every socket.io client
-					log.debug('gps position broadcasted -> map UI');
-					
-					var objData = {
-						number: number,
-						message: data,
-						//type: 'marker', 
-						//utcDate: utcDate,
-						//utcTime: utcTime,
-						utcTime: new Date( utcDateTime),
-						_timestamp: new Date( utcDateTime),
-						altitude: mapData['altitude'], // Unit: meter
-						speed: mapData['speed'], // unit: km/hr
-						heading: mapData['heading'], // unit: degree
-						//reportType: mapData['reportType'], - see: tr-600_development_document_v0_7.pdf -> //4=Motion mode static report //5 = Motion mode moving report //I=SOS alarm report //j= ACC report
-						longitude: lng,
-						latitude: lat
-					};
+			if (number) {
+				//  utcDate,utcTime
+				//var utcDate = mapData['utcDate'];
+				//var utcTime = mapData['utcTime'];
+				//var utcDate = new Date(mapData['utcDate']);
+				//var utcTime = new Date(mapData['utcTime']);
+				//var utcDateTime = new Date(parseInt(mapData['utcDate']) + parseInt(mapData['utcTime']));
+				//log.debug('date: ' + utcDate + ' time: ' + utcTime);
 
-					try {
-						db.save_into_db(objData);   //TODO: return errors and process them
-						log.debug('data passed -> DB');
-					} catch (e) {
-						log.error(e);
-					}	
-				}
+				//log.debug('date & time as Date: ' + utcDateTime); // OUTPUT: date & time as Date: 1377818379000
+				//log.debug('date&time as String: ' + utcDateTime.toString()); // the same !
+
+				var utcDateTime = mapData['utcDateTime'];
+				var lat = mapData['latitude'];
+				var lng = mapData['longitude'];
+
+				//  TODO:   verify checksum
+				var objUI = {
+					type: 'marker', 
+					deviceId: number,
+					//utcDate: utcDate,
+					//utcTime: utcTime,
+					utcDateTime: new Date( utcDateTime).toUTCString(),
+					altitude: mapData['altitude'], // Unit: meter
+					speed: mapData['speedKnots'], // unit: km/hr
+					heading: mapData['heading'], // unit: degree
+					//reportType: mapData['reportType'], - see: tr-600_development_document_v0_7.pdf -> //4=Motion mode static report //5 = Motion mode moving report //I=SOS alarm report //j= ACC report
+					lat: lat, 
+					lng: lng
+				};            
+				io.emit( 'map message', objUI ); // broadcasting using 'emit' to every socket.io client
+				log.debug('gps position broadcasted -> map UI');
+
+				var objData = {
+					number: number,
+					message: data,
+					//type: 'marker', 
+					//utcDate: utcDate,
+					//utcTime: utcTime,
+					utcTime: new Date( utcDateTime),
+					_timestamp: new Date( utcDateTime),
+					altitude: mapData['altitude'], // Unit: meter
+					speed: mapData['speed'], // unit: km/hr
+					heading: mapData['heading'], // unit: degree
+					//reportType: mapData['reportType'], - see: tr-600_development_document_v0_7.pdf -> //4=Motion mode static report //5 = Motion mode moving report //I=SOS alarm report //j= ACC report
+					longitude: lng,
+					latitude: lat
+				};
+
+				try {
+					db.save_into_db(objData);   //TODO: return errors and process them
+					log.debug('data passed -> DB');
+				} catch (e) {
+					log.error(e);
+				}	
 			}
 		}
 
