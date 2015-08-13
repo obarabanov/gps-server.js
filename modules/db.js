@@ -42,25 +42,25 @@ db.save_into_db = function (data) {
 
     connection.connect(function(err) {
       if (err) {
-        console.error('error connecting: ' + err.stack);
+        log.error('error connecting: ' + err.stack);
         status = 'connection error';
         return;
       }
 
-      console.log('connected as id: ' + connection.threadId);
+      log.debug('connected as id: ' + connection.threadId);
       status = 'connected';
     });
 
     connection.query('SELECT * FROM gps Where number = ?', [data.number], function(err, rows, fields) {
       if (err) throw err;
       status += ', Rows found: '+rows.length;
-      //console.log(status + '\n', rows);
-      //console.log('\nFields: \n', fields);
+      //log.debug(status + '\n', rows);
+      //log.debug('\nFields: \n', fields);
 	  
 	  if (rows.length > 0) 
 	  {
 	    data[ 'gps_id'] = rows[0].id;
-		console.log('GPS ID:', rows[0].id);
+		log.info('GPS ID: ', rows[0].id);
 		
 		connection.query( 'INSERT INTO geometries (_TIMESTAMP, type, geometry, creator_id, created, deleted, propertyA, propertyB, propertyC) VALUES (now(), "Point", GeomFromText( \'POINT(? ?)\'), 2, now(), 0, 0, 0, 0)', [ parseFloat( data.longitude), parseFloat( data.latitude)], function(err,res) {
 			if(err) throw err;
@@ -68,11 +68,11 @@ db.save_into_db = function (data) {
 			data[ 'creator_id'] = 2;
 			data[ 'created'] = new Date();
 			data[ 'deleted'] = 0;
-			console.log('Geometry ID:', res.insertId);
+			log.info('Geometry ID: ', res.insertId);
 		
 			connection.query( 'INSERT INTO gps_data SET ?', data, function(err,res) {
 				if(err) throw err;
-				console.log('GPS Data ID:', res.insertId);
+				log.info('GPS Data ID: ', res.insertId);
 			});
 		});
 	  }
@@ -80,7 +80,7 @@ db.save_into_db = function (data) {
 	
 	//connection.end();
     
-    console.log('status: ' + status);
+    log.info('status: ' + status);
     return status;
 };
 
@@ -91,11 +91,11 @@ db.checkIMEI = function (socket, number)
 
     connection.connect(function(err) {
 		if (err) {
-			console.error('error connecting: ' + err.stack);
+			log.error('error connecting: ' + err.stack);
 			return status;
 		}
 
-		console.log('connected as id: ' + connection.threadId);
+		log.debug('connected as id: ' + connection.threadId);
     });
 
     connection.query('SELECT * FROM gps Where number = ?', [number], function(err, rows, fields) {
@@ -107,9 +107,9 @@ db.checkIMEI = function (socket, number)
 			//socket.write('Welcome to the Telnet server!\n');
 			//socket.end();
 			//clients[ socket.remoteAddress] = number;
-			console.log('GPS ID:', rows[0].id, String.fromCharCode( 0x01));
+			log.info('GPS ID: ', rows[0].id, String.fromCharCode( 0x01));
 		} else {
-			console.log('GPS IMEI:', number, 'is not found');
+			log.info('GPS IMEI: ', number, 'is not found');
 		}
     });
 
