@@ -156,14 +156,16 @@ var tcp = net.createServer( function(socket) {
         if (_.isString(parsedData)) {
 			
 			//	TODO:	
-			//	
-			//	#1	mark socket with IMEI id.
-			//	#2	check IMEI in DB.
-			//	#3	re-factor:	depending on checkIMEI() result, write to socket here (in callback).
-		
-            db.checkIMEI(socket, parsedData);
+			//	#1	check IMEI in DB.
+			//	#2	mark socket with IMEI id.
+			//	#3	if imei not found, then socket.imei == undefined, so refuse socket connection, like:
+//			if (!socket.imei) {
+//				socket.write(0);
+//				socket.end();
+//			}
 			
-			return;
+			db.checkIMEI(socket, parsedData); //socket.imei = parsedData; // made inside checkIMEI() if found.
+			return;	//	no need further 'data' procession 
 			
             /*
              if (checkIMEI( parsedMaps) == 1) {
@@ -244,7 +246,8 @@ var tcp = net.createServer( function(socket) {
 				};
 
 				try {
-					db.save_into_db(objData);   //TODO: return errors and process them
+					//	TODO:	use socket.imei for keeping binary protocol procession.
+					db.save_into_db(objData);   
 					log.debug('data passed -> DB');
 				} catch (e) {
 					log.error(e);
