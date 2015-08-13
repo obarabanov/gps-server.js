@@ -116,7 +116,7 @@ var tcp = net.createServer( function(socket) {
         });		
     });
     */
-
+   
     socket.on('data', function(data) 
 	{
         log.info( 'tcp ' + client + '  passed data:\n' + data );
