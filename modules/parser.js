@@ -28,13 +28,13 @@ parser.detectVendor = function (data) {
         return undefined;
     }
 
-    if (data.length >= 15 && data.length <= 17) {
+    //	TODO:	detect BITREK as a vendor - is possible ?
+	if (data.length >= 15 && data.length <= 17) {
         return 'IMEI';
     } else if (data.lastIndexOf('!') == data.length - 1) {
         return 'GlobalSat';
     }
 
-    //console.log(data);
     return undefined;
 };
 
@@ -51,7 +51,7 @@ parser.parse = function (buffer)
 	    return parser.parseTeltonika(buffer);
     }
 
-    log.error('Unknown data format, supported formats are: "GlobalSat". Parsing cancelled.');
+    log.error('Unknown data format, supported formats are: "GlobalSat", "BITREK". Parsing cancelled.');
     return null;
 };
 
@@ -81,7 +81,8 @@ parser.parseGlobalSat = function (data)
     var arrParamNames = REPORT_TEMPLATE.split(',');
     //log.debug('number of supported params: ' + arrParamNames.length);
 
-    //  TODO:   verify checksum !!
+    //  TODO:   verify packet's checksum !!
+	
     for (var index in packets) {   //  returns index of array item
 
         var strDataPacket = packets[ index ];

@@ -13,8 +13,6 @@ var config = require('./modules/config');
 var parser = require('./modules/parser');
 var db = require('./modules/db');
 
-//var clients = [];
-
 //  =========   Express endpoints
 //app.use(logger('dev')); // выводим все запросы со статусами в консоль
 app.use(express.static('public'));
@@ -136,7 +134,7 @@ var tcp = net.createServer( function(socket) {
         */
         
         //  process data
-        var parsedMaps = parser.parse(data); // Buffer of data
+        var parsedMaps = parser.parse(data); // data instanceof Buffer == true
   		log.debug( 'tcp parsed data:\n' + parsedMaps);
 		
 		/*
@@ -183,34 +181,32 @@ var tcp = net.createServer( function(socket) {
 		for (var index in parsedMaps) // this approach is safe, in case parsedMaps == null.
 		{
 			var mapData = parsedMaps[ index ];
-			//console.log( mapData, clients[ socket.remoteAddress]);
-			var number = mapData['IMEI']; 
+			
+			//var number = mapData['IMEI']; //	var NUMBER - неинформативный идентификатор, ниочём..
+			var deviceId = mapData['IMEI']; 
 
-			if (number) {
+			if (deviceId) {
 				//  utcDate,utcTime
+				var utcDateTime = mapData['utcDateTime'];
 				//var utcDate = mapData['utcDate'];
 				//var utcTime = mapData['utcTime'];
 				//var utcDate = new Date(mapData['utcDate']);
 				//var utcTime = new Date(mapData['utcTime']);
 				//var utcDateTime = new Date(parseInt(mapData['utcDate']) + parseInt(mapData['utcTime']));
 				//log.debug('date: ' + utcDate + ' time: ' + utcTime);
-
 				//log.debug('date & time as Date: ' + utcDateTime); // OUTPUT: date & time as Date: 1377818379000
 				//log.debug('date&time as String: ' + utcDateTime.toString()); // the same !
 
-				var utcDateTime = mapData['utcDateTime'];
 				var lat = mapData['latitude'];
 				var lng = mapData['longitude'];
 
-				//  TODO:   verify checksum
 				var objUI = {
 					type: 'marker', 
-					deviceId: number,
-					//utcDate: utcDate,
-					//utcTime: utcTime,
+					deviceId: deviceId,
 					utcDateTime: new Date( utcDateTime).toUTCString(),
 					altitude: mapData['altitude'], // Unit: meter
-					speed: mapData['speedKnots'], // unit: km/hr
+					speed: mapData['speed'], // unit: km/hr
+					//speedKnots: mapData['speedKnots'], // unit: Knots
 					heading: mapData['heading'], // unit: degree
 					//reportType: mapData['reportType'], - see: tr-600_development_document_v0_7.pdf -> //4=Motion mode static report //5 = Motion mode moving report //I=SOS alarm report //j= ACC report
 					lat: lat, 
@@ -220,7 +216,7 @@ var tcp = net.createServer( function(socket) {
 				log.debug('gps position broadcasted -> map UI');
 
 				var objData = {
-					number: number,
+					number: deviceId,
 					message: data,
 					//type: 'marker', 
 					//utcDate: utcDate,
