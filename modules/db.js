@@ -91,7 +91,7 @@ db.save_into_db = function (data)
 		status = 'connected';
 	});
 	*/
-
+   
 	pool.getConnection(function(err, connection) {
 		if (err) {
 			log.error('error getting connection from pool: ' + err.stack);
@@ -104,7 +104,11 @@ db.save_into_db = function (data)
 		connection.query('SELECT * FROM gps Where number = ?', 
 			[data.number], 
 			function (err, rows, fields) {
-				if (err) throw err;
+				//if (err) throw err;
+				if (err) {
+					log.error('DB error: ' + err);
+					return;
+				}
 
 				status += ', Rows found: ' + rows.length;
 				//log.debug(status + '\n', rows);
@@ -113,26 +117,42 @@ db.save_into_db = function (data)
 				if (rows.length > 0)
 				{
 					data[ 'gps_id'] = rows[0].id;
-					log.info('GPS ID: ', rows[0].id);
+					log.debug('GPS ID: ', rows[0].id);
 
-					connection.query('INSERT INTO geometries (_TIMESTAMP, type, geometry, creator_id, created, deleted, propertyA, propertyB, propertyC) VALUES (now(), "Point", GeomFromText( \'POINT(? ?)\'), 2, now(), 0, 0, 0, 0)', [parseFloat(data.longitude), parseFloat(data.latitude)], function (err, res) {
-						if (err)
-							throw err;
-						data[ 'geometry_id'] = res.insertId;
-						data[ 'creator_id'] = 2;
-						data[ 'created'] = new Date();
-						data[ 'deleted'] = 0;
-						log.info('Geometry ID: ', res.insertId);
+					connection.query('INSERT INTO geometries (_TIMESTAMP, type, geometry, creator_id, created, deleted, propertyA, propertyB, propertyC) VALUES (now(), "Point", GeomFromText( \'POINT(? ?)\'), 2, now(), 0, 0, 0, 0)', 
+						[parseFloat(data.longitude), parseFloat(data.latitude)], 
+						function (err, res) {
+							//if (err) throw err;
+							if (err) {
+								//	this is the only way to prevent app crash & handle errors like:
+								//2015-08-14 17:23:03.207 ERROR [db.js] DB error: Error: ER_NO_SUCH_TABLE: Table 'gis_tracking.geometries' doesn't exist
+								log.error('DB error: ' + err);
+								return;
+							}
+							
+							data[ 'geometry_id'] = res.insertId;
+							data[ 'creator_id'] = 2;
+							data[ 'created'] = new Date();
+							data[ 'deleted'] = 0;
+							log.debug('Geometry ID: ', res.insertId);
 
-						connection.query('INSERT INTO gps_data SET ?', data, function (err, res) {
-							if (err)
-								throw err;
-							log.info('GPS Data ID: ', res.insertId);
-						});
-					});
+							connection.query('INSERT INTO gps_data SET ?', 
+								data, 
+								function (err, res) {
+									//if (err) throw err;
+									if (err) {
+										log.error('DB error: ' + err);
+										return;
+									}
+									log.debug('GPS Data ID: ', res.insertId);
+								}
+							);
+						}
+					);
 				}
 			}
 		);
+
 		log.debug('status: ' + status);
 			
 		// And done with the connection.
@@ -177,8 +197,11 @@ db.checkIMEI = function (socket, number)
 			[number], 
 			function (err, rows, fields) {
 				if (err) {
+					//throw err;
+					
 					//	TODO:	maybe close socket here ?
-					throw err;
+					log.error('DB error: ' + err);
+					return;
 				}
 
 				if (rows.length > 0) {
