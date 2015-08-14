@@ -6,7 +6,18 @@ var iconCar;
 //iconCar = L.divIcon({className: 'glyphicon glyphicon-phone'}); // works, but small
 
 iconCar = L.icon({
-    //iconUrl: 'car211_128x128.png'
+
+    //	car marker, @see https://mapicons.mapsmarker.com/markers/transportation/road-transportation/car/
+	//iconUrl: 'car (6).png', // light blue
+	//iconUrl: 'car (1).png',
+	iconUrl: 'image/car.png',
+    popupAnchor: [0, -35],
+    iconSize: [40, 46],
+    iconAnchor: [20, 45]
+	
+	/*
+    //	not marker just a car
+	//iconUrl: 'car211_128x128.png'
     //iconUrl: 'car211_24x24.png'
     iconUrl: 'car211_64x64.png',
     //iconSize: [64, 64],
@@ -15,6 +26,8 @@ iconCar = L.icon({
     iconSize: [48, 48],
     popupAnchor: [-2, -8],
     iconAnchor: [24, 24]
+	*/
+	
     /*
     @see http://leafletjs.com/reference.html#icon
     iconUrl: 'my-icon.png',
@@ -137,7 +150,7 @@ function setMarker( msg, opacity )
 function onMarkerClick(e) {
         //map.setZoom( 13 );
         //map.setView([msg.lat, msg.lng], 13);
-        map.setView([e.latlng.lat, e.latlng.lng], 13);
+        map.setView([e.latlng.lat, e.latlng.lng], 15);
 }
 
 /*
