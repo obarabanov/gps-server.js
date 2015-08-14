@@ -87,7 +87,7 @@ socket.on('map message', function (msg) {
     //  fade out previous marker
     if (arrByDevice.length > 1) {
         var updateMarker = arrByDevice[1]['objMarker'];
-        updateMarker.setOpacity( 0.5 );
+        updateMarker.setOpacity( 0.4 );
     }
     
 });
