@@ -4,4 +4,4 @@ bower_components/
 /nbproject/private/
 logs/*
 *.log
-
+config.json
