@@ -61,7 +61,7 @@ socket.on('map message', function (msg) {
         mapDevices[ msg.deviceId ] = arrByDevice = [];
     } else {
         //  ensure array size
-        if (arrByDevice.length >= 10) // 3
+        if (arrByDevice.length >= 5) // 10 - too many
         {
             //  REMOVE MARKER, remove 'click' listener
             var killMsg = arrByDevice.pop();
@@ -121,14 +121,14 @@ function setMarker( msg, opacity )
     info = 'Device: ' + msg.deviceId;
     
     info += '<br/>';
-    info += 'lat: ' + msg.lat; 
+    info += 'Lat: ' + msg.lat; 
     info += '<br/>';
-    info += 'lng: ' + msg.lng;
+    info += 'Lng: ' + msg.lng;
     info += '<br/>';
-    info += 'altitude: ' + msg.altitude + ' m';
+    info += 'Altitude: ' + msg.altitude + ' m';
     
     info += '<br/>';
-    info += 'Speed: ' + msg.speed + ' km/hr';
+    info += 'Speed: ' + parseFloat( msg.speed ).toFixed( 1 ) + ' km/hr';
     
     //info += '<br/>';
     //info += 'Date: ' + msg.utcDate + ' Time: ' + msg.utcTime;
