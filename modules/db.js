@@ -211,13 +211,14 @@ db.checkIMEI = function (socket, number)
 					//socket.write('Welcome to the Telnet server!\n');
 					//socket.end();
 					log.info('GPS ID: ', rows[0].id, String.fromCharCode(0x01));
+            		log.debug('checkIMEI() status: ' + status);
 				} else {
 					//	TODO:	close socket here, to infor device it's not registered and release socket resources.
 					log.info('GPS IMEI: ', number, ' not found');
+					log.debug('checkIMEI() status: ' + status);
 				}
 			}
 		);
-		log.debug('checkIMEI() status: ' + status);
 		
 		// And done with the connection.
 		connection.release();

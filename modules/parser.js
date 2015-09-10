@@ -33,23 +33,28 @@ parser.detectVendor = function (data) {
         return 'IMEI';
     } else if (data.lastIndexOf('!') == data.length - 1) {
         return 'GlobalSat';
-    }
+    } else if (data.length > 17) {
+        return 'Teltonika';
+	}
 
     return undefined;
 };
 
-parser.parse = function (buffer) 
+parser.parse = function (socket, buffer) 
 {
 	var data = buffer.toString('utf8');
     var vendor = parser.detectVendor(data);
+	log.info( data, data.length, vendor);
 
-    if (vendor == 'IMEI') {
-        return parser.parseIMEI(data);
-    } else if (vendor == 'GlobalSat') {
-        return parser.parseGlobalSat(data);
-    } else if (data.length > 17) {
-	    return parser.parseTeltonika(buffer);
-    }
+	if (vendor != undefined) {
+		if (vendor == 'IMEI') {
+			return parser.parseIMEI(data);
+		} else if (vendor == 'GlobalSat') {
+			return parser.parseGlobalSat(data);
+		} else if (vendor == 'Teltonika') {
+			return parser.parseTeltonika(socket, buffer);
+		}
+	}
 
     log.error('Unknown data format, supported formats are: "GlobalSat", "BITREK". Parsing cancelled.');
     return null;
@@ -60,6 +65,7 @@ parser.parseGlobalSat = function (data)
 {
     //  for 'GlobalSat' only
     var arrParsedMaps = [];
+	log.info( 'Start parsing of GlobalSat data');
 
     //  slice data string in multiple packets, if any.
     var packets = data.split('!');
@@ -129,7 +135,7 @@ parser.parseGlobalSat = function (data)
         arrParsedMaps.push(mapParams);
 
     }
-    //log.debug( 'Parsing completed: ' + arrParsedMaps.toString() );
+    log.info( 'Parsing completed: ' + arrParsedMaps.toString() );
     return arrParsedMaps;
 };
 
@@ -222,11 +228,12 @@ parser.parseIMEI = function (data) {
     return data;
 };
 
-parser.parseTeltonika = function (data)
+parser.parseTeltonika = function (socket, data)
 {
     //console.log(data);
     //'353173060059662'
     var buf;
+	log.info( 'Start parsing of Teltonika data for IMEI ' +socket.IMEI);
 
 	if (data instanceof Buffer) {
         buf = data;
@@ -252,7 +259,7 @@ parser.parseTeltonika = function (data)
         i++;
         var recs = parser.bytesToInt(buf, i, 1);
         i++;
-        //console.log( codec, recs);
+        console.log( codec, recs);
 
         if (codec == 0x08)
         {
@@ -483,7 +490,7 @@ parser.parseTeltonika = function (data)
                 }
 
 				if (position.lng != 0 || position.lat != 0) {
-					var resData = {IMEI: parser.IMEI, utcDateTime: position.timestamp, latitude: position.lat, longitude: position.lng, altitude: position.alt, heading: 0, speed: position.speed};
+					var resData = {IMEI: socket.IMEI, utcDateTime: position.timestamp, latitude: position.lat, longitude: position.lng, altitude: position.alt, heading: 0, speed: position.speed};
 					console.log( resData, position);
 					gps.push( resData);
 				}

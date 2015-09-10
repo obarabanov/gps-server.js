@@ -134,7 +134,7 @@ var tcp = net.createServer( function(socket) {
         */
         
         //  process data
-        var parsedData = parser.parse(data); // (data instanceof Buffer) == true
+        var parsedData = parser.parse(socket, data); // (data instanceof Buffer) == true
   		log.debug( 'parsed data:\n' + parsedData);
 		
         if (!parsedData) {	//	null || undefined
@@ -195,8 +195,6 @@ var tcp = net.createServer( function(socket) {
 		for (var index in parsedMaps) // this approach is safe, in case parsedMaps == null.
 		{
 			var mapData = parsedMaps[ index ];
-			
-			//var number = mapData['IMEI']; //	var NUMBER - неинформативный идентификатор, ниочём..
 			var deviceId = mapData['IMEI']; 
 
 			if (deviceId) {
@@ -247,7 +245,11 @@ var tcp = net.createServer( function(socket) {
 
 				try {
 					//	TODO:	use socket.imei for keeping binary protocol procession.
-					db.save_into_db(objData);   
+					if (deviceId != '354660042226111' && deviceId != '354660042226112' && deviceId != '354660042226113' && deviceId != '354660042226114' && deviceId != '354660042226115' && 
+					    deviceId != '354660042226116' && deviceId != '354660042226117' && deviceId != '354660042226118' && deviceId != '354660042226119' && deviceId != '354660042226120') {
+						db.save_into_db(objData);   
+					}
+						
 					log.debug('data passed -> DB');
 				} catch (e) {
 					log.error(e);
