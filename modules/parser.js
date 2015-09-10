@@ -224,6 +224,7 @@ parser.ensureUtc = function (strDate, strTime)
 parser.parseIMEI = function (data) {
     if (data.length > 15) {
         data = data.substr(2);
+		parser.IMEI = data;
 	}
     return data;
 };
@@ -490,7 +491,7 @@ parser.parseTeltonika = function (socket, data)
                 }
 
 				if (position.lng != 0 || position.lat != 0) {
-					var resData = {IMEI: socket.IMEI, utcDateTime: position.timestamp, latitude: position.lat, longitude: position.lng, altitude: position.alt, heading: 0, speed: position.speed};
+					var resData = {IMEI: socket.IMEI ? socket.IMEI : parser.IMEI, utcDateTime: position.timestamp, latitude: position.lat, longitude: position.lng, altitude: position.alt, heading: 0, speed: position.speed};
 					console.log( resData, position);
 					gps.push( resData);
 				}
