@@ -224,8 +224,8 @@ parser.ensureUtc = function (strDate, strTime)
 parser.parseIMEI = function (data) {
     if (data.length > 15) {
         data = data.substr(2);
-		parser.IMEI = data;
 	}
+	parser.IMEI = data;
     return data;
 };
 
@@ -249,9 +249,9 @@ parser.parseTeltonika = function (socket, data)
     var rCRC = parser.bytesToInt(buf, buf.length - 4, 4);
     var cCRC = parser.crc16_teltonika(buf, 8, sizeAVL);
 
-	//console.log( buf, buf[ buf.length -4], buf[ buf.length -3], buf[ buf.length -2], buf[ buf.length -1]);
-	//console.log( sizeAVL, buf.length -4*3);
-	//console.log( rCRC, cCRC);
+	console.log( buf, buf[ buf.length -4], buf[ buf.length -3], buf[ buf.length -2], buf[ buf.length -1]);
+	console.log( sizeAVL, buf.length -4*3);
+	console.log( rCRC, cCRC);
     var i = 8;
 
     if (sizeAVL == buf.length - 4 * 3 && rCRC == cCRC)
@@ -489,9 +489,12 @@ parser.parseTeltonika = function (socket, data)
                         i += 8;
                     }
                 }
+				
+				console.log( socket.IMEI, parser.IMEI);
+				var imei = '353173064436957';
 
 				if (position.lng != 0 || position.lat != 0) {
-					var resData = {IMEI: socket.IMEI ? socket.IMEI : parser.IMEI, utcDateTime: position.timestamp, latitude: position.lat, longitude: position.lng, altitude: position.alt, heading: 0, speed: position.speed};
+					var resData = {IMEI: imei, utcDateTime: position.timestamp, latitude: position.lat, longitude: position.lng, altitude: position.alt, heading: 0, speed: position.speed};
 					console.log( resData, position);
 					gps.push( resData);
 				}
