@@ -139,7 +139,7 @@ function setMarker( msg, opacity )
     
     info += '<br/>';
     //info += 'Local: ' + Date.parse(msg.utcDateTime).toLocaleString(); // doesn't work, OUTPUT:   Local: 1 380 485 979 000
-    info += 'Date & time: ' + new Date(msg.utcDateTime).toLocaleString();
+    //info += 'Date & time: ' + new Date(msg.utcDateTime).toLocaleString();
     
     //marker.bindPopup( msg.text ).openPopup();
     marker.bindPopup( info );
