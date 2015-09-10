@@ -225,7 +225,7 @@ parser.parseIMEI = function (data) {
     if (data.length > 15) {
         data = data.substr(2);
 	}
-	parser.IMEI = data;
+    parser.IMEI = data;
     return data;
 };
 
@@ -489,9 +489,9 @@ parser.parseTeltonika = function (socket, data)
                         i += 8;
                     }
                 }
-				
-				console.log( socket.IMEI, parser.IMEI);
-				var imei = '353173064436957';
+
+		console.log( socket.IMEI, parser.IMEI);
+		var imei = parser.IMEI; // '353173064436957'
 
 				if (position.lng != 0 || position.lat != 0) {
 					var resData = {IMEI: imei, utcDateTime: position.timestamp, latitude: position.lat, longitude: position.lng, altitude: position.alt, heading: 0, speed: position.speed};
