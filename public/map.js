@@ -88,6 +88,10 @@ socket.on('map message', function (msg) {
     if (arrByDevice.length > 1) {
         var updateMarker = arrByDevice[1]['objMarker'];
         updateMarker.setOpacity( 0.4 );
+		
+		//	special 'disappearing' fading for last marker in the range
+		updateMarker = arrByDevice[ arrByDevice.length - 1 ]['objMarker'];
+        updateMarker.setOpacity( 0.25 );
     }
     
 });
@@ -150,7 +154,7 @@ function setMarker( msg, opacity )
 function onMarkerClick(e) {
         //map.setZoom( 13 );
         //map.setView([msg.lat, msg.lng], 13);
-        map.setView([e.latlng.lat, e.latlng.lng], 15);
+        map.setView([e.latlng.lat, e.latlng.lng], 13);
 }
 
 /*
