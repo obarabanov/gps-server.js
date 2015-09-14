@@ -5,5 +5,4 @@ bower_components/
 /temp/
 logs/*
 *.log
-*.txt
 config.json
