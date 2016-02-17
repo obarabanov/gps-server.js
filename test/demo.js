@@ -44,7 +44,8 @@ function sendData( strData ) {
 
  */
 
-//playtrack( 'demo-log.txt');
+playtrack( 'demo.log');
+/*
 playtrack( 'track121006a.txt');
 playtrack( 'track121006b.txt');
 playtrack( 'track121013a.txt');
@@ -55,6 +56,7 @@ playtrack( 'track140103.txt');
 playtrack( 'track140107.txt');
 playtrack( 'track150311a.txt');
 playtrack( 'track150311b.txt');
+*/
 
 function playtrack( filename)
  
@@ -72,8 +74,8 @@ function playtrack( filename)
 				var previousTime;
 				var delaySum = 0;
 				//for (var index = 0; index < lines.length; index++) {
-				//for (var index = 35; index < 50; index++) { // testing
-				for (var index in lines.reverse()) { // lines should be processed in reverse.
+				for (var index = 35; index < 50; index++) { // testing
+				//for (var index in lines.reverse()) { // lines should be processed in reverse.
 					var sending = lines[index];
 					//log.debug( 'is line of String type ? ' + _.isString(sending) + '"' + sending + '"' );
 					var socket = {};				
@@ -104,7 +106,7 @@ function playtrack( filename)
 					if (previousTime) {
 						//delay = utcDateTime.valueOf() - previousTime.valueOf();
 						delay = Math.abs(utcDateTime.getTime() - previousTime.getTime()); // in motion == 30000 millis
-						//delay = Math.round(delay / 3); // for faster testing
+						delay = Math.round(delay / 3); // for faster testing
 						delaySum += delay;
 						log.debug( 'delay: ' + delay + ' millis. Data will be sent after ' + delaySum / 1000 + ' seconds.');
 						setTimeout( sendData, Math.round(delaySum), sending );
