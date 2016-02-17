@@ -2,8 +2,8 @@
 node_modules/
 bower_components/
 /nbproject/private/
+.idea/
 /temp/
 logs/*
 *.log
-*.txt
-config.json
+
