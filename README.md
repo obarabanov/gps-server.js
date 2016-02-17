@@ -18,7 +18,7 @@
 
 ### TODO
 
-- add:
+- **add:**
   - arrange universal parsing flow using adapters (parsers for specific formats ?)
   - unit tests - karma ?
   - stress tests / highload ?
@@ -29,12 +29,12 @@
   - admin UI:
     - page with current / active metrics (# of connected devices and/or UI users)
     - log page (events/usage listing), with e.g. ~1,000 lines max
-- remove:
+- **remove:**
   - remove: saving into DB
-  - remove: chat.html (socket.io demo)
+  - *remove: chat.html (socket.io demo)*
   - remove: /libs dependencies
   - remove: bower & dependencies ?
-- configuration:
+- **configuration:**
   - setup project through the package.json
   - arrange npm "scripts"
   - extend configuration support

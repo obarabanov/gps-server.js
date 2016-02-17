@@ -19,8 +19,7 @@ app.use(express.static('public'));
 
 app.get('/', function(req, res){
   //res.send('<h1>Hello world</h1>');
-  //res.sendFile(__dirname + '/public1/chat.html'); // works ok ! // NOTE: but index.html always has priority, and rendered instead..
-  res.sendFile(__dirname + '/public/map.html'); 
+  res.sendFile(__dirname + '/public/map.html'); // NOTE: but index.html always has priority, and rendered instead..
 });
 
 //  =========   Messaging
@@ -32,31 +31,26 @@ io.on('connection', function(socket){
   socket.on('disconnect', function(){
     //console.log('user disconnected');
     log.info('socket.io disconnected');
-  });  
-  
-  /*
-  //    TODO:   @see http://socket.io/get-started/chat/
-Here are some ideas to improve the application:
+  });
 
-    Broadcast a message to connected users when someone connects or disconnects
-    Add support for nicknames
-    Don’t send the same message to the user that sent it himself. Instead, append the message directly as soon as he presses enter.
-    Add “{user} is typing” functionality
-    Show who’s online
-    Add private messaging   
-    */
-  socket.on('chat message', function(msg){
-    console.log('chat message: ' + msg);
-    io.emit('chat message', msg);
-  });  
-  
-  socket.on('map message', function(msg){
-    //console.log('map message: ' + msg );
-    //console.log('map message: ' + msg.type + ' text: ' + msg.text + ' lat: ' + msg.lat + ' lng: ' + msg.lng );
-    log.info('map message: ' + msg);
-    
-    io.emit('map message', msg);
-  });  
+    /*
+     //    @see http://socket.io/get-started/chat/
+     Here are some ideas to improve the application:
+
+     Broadcast a message to connected users when someone connects or disconnects
+     Add support for nicknames
+     Don’t send the same message to the user that sent it himself. Instead, append the message directly as soon as he presses enter.
+     Add “{user} is typing” functionality
+     Show who’s online
+     Add private messaging
+     */
+    socket.on('map message', function (msg) {
+        //console.log('map message: ' + msg );
+        //console.log('map message: ' + msg.type + ' text: ' + msg.text + ' lat: ' + msg.lat + ' lng: ' + msg.lng );
+        log.info('map message: ' + msg);
+
+        io.emit('map message', msg);
+    });
   
 });
 
