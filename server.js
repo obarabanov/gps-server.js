@@ -11,7 +11,7 @@ var log = require('./modules/log')(module);
 var logInput = require('./modules/logInput')(module);
 var config = require('./modules/config');
 var parser = require('./modules/parser');
-var db = require('./modules/db');
+//var db = require('./modules/db');
 
 //  =========   Express endpoints
 //app.use(logger('dev')); // выводим все запросы со статусами в консоль
@@ -21,13 +21,6 @@ app.get('/', function(req, res){
   //res.send('<h1>Hello world</h1>');
   //res.sendFile(__dirname + '/public1/chat.html'); // works ok ! // NOTE: but index.html always has priority, and rendered instead..
   res.sendFile(__dirname + '/public/map.html'); 
-});
-
-app.get('/db', function(req, res) {
-    
-    var status = db.ping_db(); //  TODO: status is blank, wait for asynch queries procession
-    res.send('<h3>DB status:</h3><br/>' + status);
-    
 });
 
 //  =========   Messaging
@@ -132,7 +125,15 @@ var tcp = net.createServer( function(socket) {
             socket.destroy();
         }
         */
-        
+
+
+        /*
+        TODO:
+           parser adapters support
+           detect input type data
+           add support for BiTrek devices *without* DB usage
+        */
+
         //  process data
         var parsedData = parser.parse(socket, data); // (data instanceof Buffer) == true
   		log.debug( 'parsed data:\n' + parsedData);
@@ -150,12 +151,12 @@ var tcp = net.createServer( function(socket) {
 	   
 			return;
         }
-		
+
+        //	TODO:   add support for BiTrek devices *without* DB usage
 		//	check if this is IMEI packet
         //if ((parsedMaps) && !(parsedMaps instanceof Array)) {
         if (_.isString(parsedData)) {
 			
-			//	TODO:	
 			//	#1	check IMEI in DB.
 			//	#2	mark socket with IMEI id.
 			//	#3	if imei not found, then socket.imei == undefined, so refuse socket connection, like:
@@ -164,7 +165,7 @@ var tcp = net.createServer( function(socket) {
 //				socket.end();
 //			}
 			
-			db.checkIMEI(socket, parsedData); //socket.imei = parsedData; // made inside checkIMEI() if found.
+			//db.checkIMEI(socket, parsedData); //socket.imei = parsedData; // made inside checkIMEI() if found.
 			return;	//	no need further 'data' procession 
 			
             /*
@@ -243,7 +244,8 @@ var tcp = net.createServer( function(socket) {
 					latitude: lat
 				};
 
-				try {
+				/*
+                try {
 					//	TODO:	use socket.imei for keeping binary protocol procession.
 					if (deviceId != '354660042226111' && deviceId != '354660042226112' && deviceId != '354660042226113' && deviceId != '354660042226114' && deviceId != '354660042226115' && 
 					    deviceId != '354660042226116' && deviceId != '354660042226117' && deviceId != '354660042226118' && deviceId != '354660042226119' && deviceId != '354660042226120') {
@@ -253,7 +255,8 @@ var tcp = net.createServer( function(socket) {
 					log.debug('data passed -> DB');
 				} catch (e) {
 					log.error(e);
-				}	
+				}
+				*/
 			}
 		}
 
