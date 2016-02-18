@@ -20,20 +20,27 @@
 
 - **add:**
   - arrange universal parsing flow using adapters (parsers for specific formats ?)
+    - GlobalSat
+    - BiTrek
+    - Teltonika
+    - Elgato Ukr
+    - RCS
+    - Ruptela
+    - Queclink ?
   - unit tests - karma ?
   - stress tests / highload ?
   - support for demo mobile app
   - support for OsmAnd mobile clients ?
-  - cloud support / cloud demo
+  - cloud support / cloud demo (**note:** RH cloud HTTP+TCP ports config issue)
   - UI: parameter support for showing one device or group ?
   - admin UI:
     - page with current / active metrics (# of connected devices and/or UI users)
     - log page (events/usage listing), with e.g. ~1,000 lines max
 - **remove:**
-  - remove: saving into DB
-  - *remove: chat.html (socket.io demo)*
+  - <s>remove: saving into DB
+  - <s>remove: chat.html (socket.io demo)
   - remove: /libs dependencies
-  - remove: bower & dependencies ?
+  - remove: bower usage and  dependencies ?
 - **configuration:**
   - setup project through the package.json
   - arrange npm "scripts"

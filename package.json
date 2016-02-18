@@ -6,8 +6,6 @@
   "dependencies": {
     "dateformat": "^1.0.11",
     "express": "^4.10.2",
-    "morgan": "~1.5.3",
-    "mysql": "^2.7.0",
     "nconf": "*",
     "socket.io": "^1.3.5",
     "underscore": "^1.8.3",

@@ -9,22 +9,10 @@ parser.strings = {
     NO_PARAM: 'unknown'
 };
 
-parser.isProperInput = function (data) {
+parser.detectVendor = function (data)
+{
     if (!_.isString(data)) {
-        throw new Error( 'Data is not of String type.' );
-    }
-    return true;
-};
-
-parser.detectVendor = function (data) {
-
-    var isProper = false;
-    try {
-        isProper = parser.isProperInput(data);
-    } catch (e) {
-        log.error(e);
-    }
-    if (!isProper) {
+        log.error('Data is not of String type.');
         return undefined;
     }
 
@@ -40,23 +28,32 @@ parser.detectVendor = function (data) {
     return undefined;
 };
 
-parser.parse = function (socket, buffer) 
+/**
+ * Procession of received data.
+ *
+ * @param {type} socket - socket connection.
+ * @param {Buffer} buffer - raw binary data of Buffer type.
+ */
+parser.parse = function (socket, buffer)
 {
-	var data = buffer.toString('utf8');
-    var vendor = parser.detectVendor(data);
-	log.info( data, data.length, vendor);
+    var strData = buffer.toString('utf8');
+    log.debug( 'packet.length: ' + strData.length + ' as string: ' + strData );
 
-	if (vendor != undefined) {
+    var vendor = parser.detectVendor(strData);
+    log.debug( "packet's format: " + vendor );
+
+    //TODO: keep socket.imei for ALL devices
+    if (vendor) {
 		if (vendor == 'IMEI') {
-			return parser.parseIMEI(data);
+			return parser.parseIMEI(strData);
 		} else if (vendor == 'GlobalSat') {
-			return parser.parseGlobalSat(data);
+			return parser.parseGlobalSat(strData);
 		} else if (vendor == 'Teltonika') {
 			return parser.parseTeltonika(socket, buffer);
 		}
 	}
 
-    log.error('Unknown data format, supported formats are: "GlobalSat", "BITREK". Parsing cancelled.');
+    log.error("Unknown data packet's format. Procession cancelled.");
     return null;
 };
 
@@ -225,7 +222,6 @@ parser.parseIMEI = function (data) {
     if (data.length > 15) {
         data = data.substr(2);
 	}
-    parser.IMEI = data;
     return data;
 };
 
@@ -234,7 +230,7 @@ parser.parseTeltonika = function (socket, data)
     //console.log(data);
     //'353173060059662'
     var buf;
-	log.info( 'Start parsing of Teltonika data for IMEI ' +socket.IMEI);
+	log.info( 'Start parsing of Teltonika data for IMEI: ' +socket.IMEI);
 
 	if (data instanceof Buffer) {
         buf = data;
@@ -490,8 +486,9 @@ parser.parseTeltonika = function (socket, data)
                     }
                 }
 
-		console.log( socket.IMEI, parser.IMEI);
-		var imei = parser.IMEI; // '353173064436957'
+                console.log(socket.IMEI);
+                //var imei = parser.IMEI; // '353173064436957'  // this is mistake
+                var imei = socket.IMEI; //TODO:	verify if IMEI present, like: socket.imei == undefined ?
 
 				if (position.lng != 0 || position.lat != 0) {
 					var resData = {IMEI: imei, utcDateTime: position.timestamp, latitude: position.lat, longitude: position.lng, altitude: position.alt, heading: 0, speed: position.speed};
