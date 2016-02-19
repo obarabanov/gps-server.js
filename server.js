@@ -13,7 +13,7 @@ var config = require('./modules/config');
 var parser = require('./modules/parser');
 
 //  =========   Express endpoints
-//app.use(logger('dev')); // âûâîäèì âñå çàïğîñû ñî ñòàòóñàìè â êîíñîëü
+//app.use(logger('dev')); // Ğ²Ñ‹Ğ²Ğ¾Ğ´Ğ¸Ğ¼ Ğ²ÑĞµ Ğ·Ğ°Ğ¿Ñ€Ğ¾ÑÑ‹ ÑĞ¾ ÑÑ‚Ğ°Ñ‚ÑƒÑĞ°Ğ¼Ğ¸ Ğ² ĞºĞ¾Ğ½ÑĞ¾Ğ»ÑŒ
 app.use(express.static('public'));
 
 app.get('/', function(req, res){
@@ -38,9 +38,9 @@ io.on('connection', function (socket) {
 
      Broadcast a message to connected users when someone connects or disconnects
      Add support for nicknames
-     Don’t send the same message to the user that sent it himself. Instead, append the message directly as soon as he presses enter.
-     Add “{user} is typing” functionality
-     Show who’s online
+     Donâ€™t send the same message to the user that sent it himself. Instead, append the message directly as soon as he presses enter.
+     Add â€œ{user} is typingâ€ functionality
+     Show whoâ€™s online
      Add private messaging
      */
     socket.on('map message', function (msg) {
@@ -106,7 +106,7 @@ var tcp = net.createServer( function(socket) {
          add support for BiTrek devices *without* DB usage
          */
 
-        //  process data
+        //  process data packet
         var parsedData = parser.parse(socket, data); // (data instanceof Buffer) == true
         //log.debug( 'parsed data:\n' + parsedData); //TODO: stringify parsed results.
 
@@ -117,12 +117,9 @@ var tcp = net.createServer( function(socket) {
             return;
         }
 
-        //	check if this is IMEI packet
-        //	TODO:	for further procession - what if IMEI not present, like: socket.imei == undefined ?  Refuse socket connection, or what ?
-        if (_.isString(parsedData)) {
-            socket.IMEI = parsedData; // keep device's IMEI (ID) in socket connection
-            socket.write(String.fromCharCode(0x01)); // reply to connected device.
-            return;	//	no need further 'data' procession
+        if (_.isString(parsedData) && (parsedData == 'connection initialized')) {
+            log.info('Socket connection initialized. Waiting for data from device.');
+            return;
         }
 
         var parsedMaps;
@@ -132,6 +129,7 @@ var tcp = net.createServer( function(socket) {
 
         if (!parsedMaps) {
             log.error('Wrong parsed data format. Procession stopped.');
+            //  keep connection opened, as there may be additional data ?
             return;
         }
 
@@ -172,6 +170,7 @@ var tcp = net.createServer( function(socket) {
             }
         }
 
+        //  data packet fully processed.
         socket.end();
 
     });

@@ -45,8 +45,10 @@ parser.parse = function (socket, buffer)
     //TODO: keep socket.imei for ALL devices
     if (vendor) {
 		if (vendor == 'IMEI') {
-			return parser.parseIMEI(strData);
-		} else if (vendor == 'GlobalSat') {
+            socket.IMEI = parser.parseIMEI(strData); // keep device's IMEI (ID) in socket connection
+            socket.write(String.fromCharCode(0x01)); // reply to connected device, keep connection opened.
+            return 'connection initialized';
+        } else if (vendor == 'GlobalSat') {
 			return parser.parseGlobalSat(strData);
 		} else if (vendor == 'Teltonika') {
 			return parser.parseTeltonika(socket, buffer);
@@ -237,8 +239,18 @@ parser.parseTeltonika = function (socket, data)
     } else {
         buf = parser.stringToBytes(data);
     }
-
     //console.log(buf, data);
+
+    //	TODO:	for further procession - what if IMEI not present, like: socket.imei == undefined ?  Refuse socket connection, or what ?
+
+    /*
+     TODO:
+     Сервер принимает пакет, проверяет его целостность и отправляет подтверждение:
+     ? 0 – если пакет имеет неверную контрольную сумму или не разобран,
+     ? Число больше 0 соответствующее кол-ву извлечённых записей из принятого
+     пакета.
+     */
+
     var gps = [];
 
     var sizeAVL = parser.bytesToInt(buf, 4, 4);
