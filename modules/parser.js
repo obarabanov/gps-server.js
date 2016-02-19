@@ -16,7 +16,6 @@ parser.detectVendor = function (data)
         return undefined;
     }
 
-    //	TODO:	detect BITREK as a vendor - is possible ?
 	if (data.length >= 15 && data.length <= 17) {
         return 'IMEI';
     } else if (data.lastIndexOf('!') == data.length - 1) {
@@ -42,7 +41,6 @@ parser.parse = function (socket, buffer)
     var vendor = parser.detectVendor(strData);
     log.debug( "packet's format: " + vendor );
 
-    //TODO: keep socket.imei for ALL devices
     if (vendor) {
 		if (vendor == 'IMEI') {
             socket.IMEI = parser.parseIMEI(strData); // keep device's IMEI (ID) in socket connection
@@ -227,29 +225,34 @@ parser.parseIMEI = function (data) {
     return data;
 };
 
+/**
+ * @see BITREK protocol description:
+ *
+ * Сервер принимает пакет, проверяет его целостность и отправляет подтверждение:
+ *  0 – если пакет имеет неверную контрольную сумму или не разобран,
+ *  Число больше 0 соответствующее кол-ву извлечённых записей из принятого пакета.
+ *
+ * @param socket
+ * @param data
+ * @returns {*}
+ */
 parser.parseTeltonika = function (socket, data)
 {
-    //console.log(data);
-    //'353173060059662'
-    var buf;
-	log.info( 'Start parsing of Teltonika data for IMEI: ' +socket.IMEI);
+    if (!socket.hasOwnProperty('IMEI')) {
+        log.error( "device's IMEI undefined. Procession stopped." );
+        socket.write(0);
+        // here, socket is still open.
+        return;
+    }
 
+	log.info( 'Start parsing data in Teltonika format, for IMEI: ' +socket.IMEI);
+
+    var buf;
 	if (data instanceof Buffer) {
         buf = data;
     } else {
         buf = parser.stringToBytes(data);
     }
-    //console.log(buf, data);
-
-    //	TODO:	for further procession - what if IMEI not present, like: socket.imei == undefined ?  Refuse socket connection, or what ?
-
-    /*
-     TODO:
-     Сервер принимает пакет, проверяет его целостность и отправляет подтверждение:
-     ? 0 – если пакет имеет неверную контрольную сумму или не разобран,
-     ? Число больше 0 соответствующее кол-ву извлечённых записей из принятого
-     пакета.
-     */
 
     var gps = [];
 
@@ -498,19 +501,19 @@ parser.parseTeltonika = function (socket, data)
                     }
                 }
 
-                console.log(socket.IMEI);
-                //var imei = parser.IMEI; // '353173064436957'  // this is mistake
-                var imei = socket.IMEI; //TODO:	verify if IMEI present, like: socket.imei == undefined ?
+                //console.log(socket.IMEI);
+                //  by now, must be guaranteed: socket.hasOwnProperty('IMEI') == true
+                var imei = socket.IMEI;
 
 				if (position.lng != 0 || position.lat != 0) {
 					var resData = {IMEI: imei, utcDateTime: position.timestamp, latitude: position.lat, longitude: position.lng, altitude: position.alt, heading: 0, speed: position.speed};
-					console.log( resData, position);
+					//console.log( resData, position);
 					gps.push( resData);
 				}
             }
         }
 
-        //console.log( gps);
+        console.log( gps);
         return gps;
     }
 

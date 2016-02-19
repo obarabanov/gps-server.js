@@ -92,8 +92,9 @@ var tcp = net.createServer( function(socket) {
     socket.on('data', function(data)
     {
         //log.info( 'tcp ' + client + '  passed data:\n' + data );
-        //log.info( 'TCP got data from ' + client );
-        log.info( 'TCP got data on socket: ' + socket ); // TODO: debug socket.IMEI value
+        log.info( 'TCP got data from ' + client );
+        //log.info( 'TCP got data on socket: ' + socket ); // TODO: debug socket.IMEI value
+        //log.info( 'TCP got data on socket: ' + JSON.stringify( socket.address() ) );
         logInput.info( '' + data ); // saving input -> into a file.
 
         //log.debug( 'data instanceof Buffer ? ' + (data instanceof Buffer) );
@@ -116,6 +117,8 @@ var tcp = net.createServer( function(socket) {
             socket.destroy();
             return;
         }
+
+        //  TODO:   push return types & socket handlings down, under -> parser ?
 
         if (_.isString(parsedData) && (parsedData == 'connection initialized')) {
             log.info('Socket connection initialized. Waiting for data from device.');
