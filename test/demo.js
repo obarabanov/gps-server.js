@@ -4,7 +4,7 @@ var config = require('../modules/config');
 var log = require('../modules/log')(module);
 var fs = require('fs');
 var _ = require('underscore');
-var parser = require('../modules/parser');
+var parser = require('../modules/parsing/parser');
 
 var client = new net.Socket();
 client.setEncoding('utf8');

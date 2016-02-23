@@ -10,7 +10,7 @@ var _ = require('underscore');
 var log = require('./modules/log')(module);
 var logInput = require('./modules/logInput')(module);
 var config = require('./modules/config');
-var parser = require('./modules/parser');
+var parser = require('./modules/parsing/parser');
 
 //  =========   Express endpoints
 //app.use(logger('dev')); // выводим все запросы со статусами в консоль
@@ -104,7 +104,6 @@ var tcp = net.createServer( function(socket) {
          TODO:
          parser adapters support
          detect input type data
-         add support for BiTrek devices *without* DB usage
          */
 
         //  process data packet
