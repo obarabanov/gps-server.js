@@ -306,7 +306,7 @@ parser.parseTeltonika = function (socket, data)
     return null;
 };
 
-crc16_teltonika = function (data, p, size)
+function crc16_teltonika(data, p, size)
 {
     var crc16_result = 0x0000;
     for (var i = p; i < p + size; i++)
@@ -320,7 +320,7 @@ crc16_teltonika = function (data, p, size)
     return crc16_result;
 };
 
-bytesToInt = function (array, p, size)
+function bytesToInt(array, p, size)
 {
     var value = 0;
     for (var i = p; i <= p + size - 1; i++) {
@@ -341,7 +341,7 @@ bytesToString = function (buf)
 };
 */
 
-stringToBytes = function (str)
+function stringToBytes(str)
 {
     var bytes = [];
     for (var i = 0; i < str.length; ++i)

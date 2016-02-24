@@ -1,6 +1,7 @@
 var _ = require('underscore');
 var log = require('../../log')(module);
 
+// --- GlobalSat GPS ------------------------------------------------------------
 var parser = {};
 module.exports = parser;
 
@@ -9,9 +10,51 @@ labels = {
     NO_PARAM: 'unknown'
 };
 
-// --- GlobalSat GPS ------------------------------------------------------------
-parser.parse = function (data)
+/**
+ * Are passed data in supported format and can be parsed ?
+ *
+ * @param data
+ * @returns {boolean}   true if data format recognized and can be parsed,
+ *                      false otherwise.
+ */
+parser.canParse = function (data)
 {
+    var strData;
+    try {
+        if (_.isString(data)) {
+            strData = data;
+        } else {
+            //  trying convert data
+            if (data instanceof Buffer) {
+                strData = data.toString('utf8'); // convert binary data to string so it can be processed.
+            } else {
+                throw new Exception("can't convert data to String.");
+            }
+        }
+
+        //  The general format of GlobalSat TR-600 message is:    GSx,IMEI,[T,S,]Field1,Field2,……,FieldN*Checksum!
+        //  use RegExp for data format verification
+        var pattern = /GS[SsGgCrhe]{1},\d{15},.+\*\d+!/;
+        return pattern.test(strData);
+
+    } catch(ex) {
+        log.error('Data packet analysis failed: ' + ex);
+    }
+    return false;
+}
+
+//parser.parse = function (data)
+parser.parse = function (socket, data)
+{
+    if (!_.isString(data)) {
+        var strData;
+        //  trying convert data
+        if (data instanceof Buffer) {
+            strData = data.toString('utf8'); // convert binary data to string so it can be processed.
+        }
+        data = strData;
+    }
+
     //  for 'GlobalSat' only
     var arrParsedMaps = [];
 	log.info( 'Start parsing of GlobalSat data');
@@ -88,7 +131,7 @@ parser.parse = function (data)
     return arrParsedMaps;
 };
 
-ensureDecimal = function (strValue)
+function ensureDecimal(strValue)
 {
     var res = '';
     try {
@@ -105,7 +148,7 @@ ensureDecimal = function (strValue)
  * @param {type} strValue
  * @returns {String}
  */
-convert2decimal = function (strValue)
+function convert2decimal(strValue)
 {
     if (_.isEmpty(strValue)) {
         throw new Error('Can\'t convert empty string into decimal coords value.');
@@ -143,7 +186,7 @@ convert2decimal = function (strValue)
     return res.toString();
 };
 
-ensureUtc = function (strDate, strTime)
+function ensureUtc(strDate, strTime)
 {
     //  formatter = new SimpleDateFormat("ddMMyy");
     //  DateFormat formatter = new SimpleDateFormat("HHmmss");
