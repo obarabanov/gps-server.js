@@ -1,9 +1,57 @@
 var log = require('../../log')(module);
 
+
+// --- BiTrek GPS ------------------------------------------------------------
 var parser = {};
 module.exports = parser;
 
-// --- BiTrek GPS ------------------------------------------------------------
+/**
+ * Are passed data in supported format and can be parsed ?
+ *
+ * @param data
+ * @returns {boolean}   true if data format recognized and can be parsed,
+ *                      false otherwise.
+ */
+parser.canParse = function (data)
+{
+    log.debug('teltonika.canParse():');
+
+    //  TODO:   support 2 packet types:
+    //  1. init session packet - 17 bytes [0,15,15 bytes]
+    //  2. Структура пакета данных:
+    //      Преамбула – 4 нуля
+    //      Длина данных AVL – 4 байта, от старшего к младшему
+    //      AVL – доступные данные
+    //      контрольной суммы CRC16 – 4 байта, от старшего к младшему
+
+    //  TODO:   use ASCII encoding: @see: https://nodejs.org/api/buffer.html#buffer_buf_tostring_encoding_start_end
+    //          buf.toString('ascii');
+
+
+    var strData;
+    try {
+        if (_.isString(data)) {
+            strData = data;
+        } else {
+            //  trying convert data
+            if (data instanceof Buffer) {
+                strData = data.toString('utf8'); // convert binary data to string so it can be processed.
+            } else {
+                throw new Exception("can't convert data to String.");
+            }
+        }
+
+        //  The general format of GlobalSat TR-600 message is:    GSx,IMEI,[T,S,]Field1,Field2,……,FieldN*Checksum!
+        //  use RegExp for data format verification
+        var pattern = /GS[SsGgCrhe]{1},\d{15},.+\*\d+!/;
+        return pattern.test(strData);
+
+    } catch(ex) {
+        log.error('Data packet analysis failed: ' + ex);
+    }
+    return false;
+}
+
 parser.parseIMEI = function (data) {
     if (data.length > 15) {
         data = data.substr(2);

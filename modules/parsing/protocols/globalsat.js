@@ -19,7 +19,7 @@ labels = {
  */
 parser.canParse = function (data)
 {
-    log.debug('canParse():');
+    log.debug('globalsat.canParse():');
     var strData;
     try {
         //  TODO:   wrap as ensureString() method.
