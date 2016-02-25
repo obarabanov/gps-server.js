@@ -19,8 +19,10 @@ labels = {
  */
 parser.canParse = function (data)
 {
+    log.debug('canParse():');
     var strData;
     try {
+        //  TODO:   wrap as ensureString() method.
         if (_.isString(data)) {
             strData = data;
         } else {
@@ -33,9 +35,11 @@ parser.canParse = function (data)
         }
 
         //  The general format of GlobalSat TR-600 message is:    GSx,IMEI,[T,S,]Field1,Field2,……,FieldN*Checksum!
-        //  use RegExp for data format verification
-        var pattern = /GS[SsGgCrhe]{1},\d{15},.+\*\d+!/;
-        return pattern.test(strData);
+        //  NOTE:   Checksum - is the hexadecimal value, converted to two ASCII characters (0-9, A-F)
+        var pattern = /GS[SsGgCrhe]{1},\d{15},.+\*[0-9A-F]{2}!/; //  use RegExp for data format verification
+        var passed = pattern.test(strData);
+        log.debug('passed RegExp ? ' + passed);
+        return passed;
 
     } catch(ex) {
         log.error('Data packet analysis failed: ' + ex);
