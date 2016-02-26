@@ -20,13 +20,19 @@
 
 - **add:**
   - arrange universal parsing flow using adapters (parsers for specific formats ?)
-    - GlobalSat
-    - BiTrek
-    - Teltonika
-    - Elgato Ukr
-    - RCS
-    - Ruptela
-    - Queclink ?
+    - **binary:**
+      - <s>BiTrek
+      - <s>Teltonika
+    - **string (NMEA ?) format:**
+      - GlobalSat:
+        - <s>reports: GSr
+        - config and other packets
+      - Elgato Ukr
+      - Queclink ?
+    - **others ?:**
+      - RCS
+      - Ruptela
+  - support NMEA format, via existing js module ?
   - unit tests - karma ?
   - stress tests / highload ?
   - support for demo mobile app
