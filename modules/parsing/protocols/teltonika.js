@@ -12,51 +12,91 @@ module.exports = parser;
  * @returns {boolean}   true if data format recognized and can be parsed,
  *                      false otherwise.
  */
-parser.canParse = function (data)
+parser.canParse = function(buffer)
 {
     log.debug('teltonika.canParse():');
 
-    //  TODO:   support 2 packet types:
-    //  1. init session packet - 17 bytes [0,15,15 bytes]
-    //  2. Структура пакета данных:
+    if (!Buffer.isBuffer(buffer)) {
+        log.error("Data packet is not of Buffer type.");
+        return false;
+    }
+    log.debug("Data packet has length: " + buffer.length);
+
+    //  #1 packet type:
+    //  init session packet - 17 bytes [0,15,15 bytes]
+    if (buffer.length == 17)
+    {
+        if (buffer[0] == 0 && buffer[1] == 15) {
+            //  for BITREK, first 2 bytes are always 0 and 15 (IMEI length).
+            log.debug("Recognized Bitrek 'init session' packet.");
+            return true;
+        } else {
+            log.debug("It's not a Bitrek's 'init session' packet.");
+            return false;
+        }
+    }
+
+    //  #2 Data packet type:
+    //  Структура пакета данных:
     //      Преамбула – 4 нуля
     //      Длина данных AVL – 4 байта, от старшего к младшему
     //      AVL – доступные данные
     //      контрольной суммы CRC16 – 4 байта, от старшего к младшему
 
-    //  TODO:   use ASCII encoding: @see: https://nodejs.org/api/buffer.html#buffer_buf_tostring_encoding_start_end
-    //          buf.toString('ascii');
-
-
-    var strData;
-    try {
-        if (_.isString(data)) {
-            strData = data;
-        } else {
-            //  trying convert data
-            if (data instanceof Buffer) {
-                strData = data.toString('utf8'); // convert binary data to string so it can be processed.
-            } else {
-                throw new Exception("can't convert data to String.");
-            }
-        }
-
-        //  The general format of GlobalSat TR-600 message is:    GSx,IMEI,[T,S,]Field1,Field2,……,FieldN*Checksum!
-        //  use RegExp for data format verification
-        var pattern = /GS[SsGgCrhe]{1},\d{15},.+\*\d+!/;
-        return pattern.test(strData);
-
-    } catch(ex) {
-        log.error('Data packet analysis failed: ' + ex);
+    if (buffer.length <= 12) {
+        log.debug("Data packet is too short. Giving up.");
+        return false;
     }
+
+    if (buffer[0] == 0 && buffer[1] == 0 && buffer[2] == 0 && buffer[3] == 0) {
+        log.debug("Found leading 4 zeros. Going on.");
+    } else {
+        log.debug("Not found leading 4 zeros. Giving up.");
+        return false;
+    }
+
+    //  trying to verify AVL data length
+    var lengthAVL = buffer.readUInt32BE(4);
+    log.debug("AVL data length: " + lengthAVL);
+    if ( (4 + 4 + lengthAVL + 4) === buffer.length ) {
+        log.debug("Ok - data packet structure is supported.");
+        return true;
+    }
+    log.debug("No - data packet structure is not supported.");
     return false;
 }
 
-parser.parseIMEI = function (data) {
-    if (data.length > 15) {
-        data = data.substr(2);
-	}
-    return data;
+parser.parse = function(socket, buffer)
+{
+    //  #1 packet type:
+    //  init session packet - 17 bytes [0,15,15 bytes]
+    if (buffer.length == 17)
+    {
+        if (buffer[0] == 0 && buffer[1] == 15) {
+            //  for BITREK, first 2 bytes are always 0 and 15 (IMEI length).
+            return parseInitPacket(socket, buffer);
+        } else {
+            log.debug("It's not a Bitrek's 'init session' packet.");
+            return null;
+        }
+    }
+
+    //  type #2 - Data packet:
+    if (buffer.length > 12) {
+        return parseDataPacket(socket, data)
+    }
+
+    log.info("It's not a Bitrek / Teltonika data packet.");
+    return null;
+}
+
+function parseInitPacket(socket, buffer)
+{
+    var imei = buffer.toString('ascii').substr(2);
+    socket.device_imei = imei; // keep device's IMEI (ID) in socket connection
+    socket.write(String.fromCharCode(0x01)); // reply '1' to device, to indicate connection has been initialized.
+    log.debug("Session initialized with device_imei: " + socket.device_imei);
+    return []; // return value must be Array, otherwise server will close socket connection, and session data will be lost.
 };
 
 /**
@@ -69,17 +109,20 @@ parser.parseIMEI = function (data) {
  * @param socket
  * @param data
  * @returns {*}
+ *
+ * @author Sergey Shelkovnikov
  */
-parser.parseTeltonika = function (socket, data)
+function parseDataPacket(socket, data)
 {
-    if (!socket.hasOwnProperty('IMEI')) {
-        log.error( "device's IMEI undefined. Procession stopped." );
-        socket.write(0);
+    var propName = 'device_imei';
+    if (!socket.hasOwnProperty(propName)) {
+        log.error( "Socket's property '"+propName+"' undefined. Procession stopped." );
+        socket.write(0); // reply '0' to deny session.
         // here, socket is still open.
         return;
     }
 
-	log.info( 'Start parsing data in Teltonika format, for IMEI: ' +socket.IMEI);
+	log.info('Start parsing data in Teltonika format, for IMEI: ' + socket.device_imei);
 
     var buf;
 	if (data instanceof Buffer) {
@@ -335,9 +378,9 @@ parser.parseTeltonika = function (socket, data)
                     }
                 }
 
-                //console.log(socket.IMEI);
-                //  by now, must be guaranteed: socket.hasOwnProperty('IMEI') == true
-                var imei = socket.IMEI;
+                //console.log(socket.device_imei);
+                //  by now, must be guaranteed: socket.hasOwnProperty('device_imei') == true
+                var imei = socket.device_imei;
 
 				if (position.lng != 0 || position.lat != 0) {
 					var resData = {IMEI: imei, utcDateTime: position.timestamp, latitude: position.lat, longitude: position.lng, altitude: position.alt, heading: 0, speed: position.speed};
