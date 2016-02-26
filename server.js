@@ -96,7 +96,12 @@ var tcp = net.createServer( function(socket) {
         //log.info( 'TCP got data on socket: ' + socket ); // TODO: debug socket.IMEI value
         //log.info( 'TCP got data on socket: ' + JSON.stringify( socket.address() ) );
 
-        logInput.info( '' + data ); // saving input -> into a file.
+        try {
+            //  TODO:   data encoding ?
+            logInput.info( '' + data ); // saving input -> into a file.
+        } catch(ex) {
+            log.error('file logging failure: ' + ex);
+        }
 
         //log.debug( 'data instanceof Buffer ? ' + (data instanceof Buffer) );
         //log.debug( 'is data of String type ? ' + _.isString(data) );
