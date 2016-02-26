@@ -17,20 +17,20 @@ labels = {
  * @returns {boolean}   true if data format recognized and can be parsed,
  *                      false otherwise.
  */
-parser.canParse = function (data)
+parser.canParse = function(buffer)
 {
     log.debug('globalsat.canParse():');
     var strData;
     try {
         //  TODO:   wrap as ensureString() method.
-        if (_.isString(data)) {
-            strData = data;
+        if (_.isString(buffer)) {
+            strData = buffer;
         } else {
             //  trying convert data
-            if (data instanceof Buffer) {
-                strData = data.toString('utf8'); // convert binary data to string so it can be processed.
+            if (buffer instanceof Buffer) {
+                strData = buffer.toString('ascii'); // convert binary data to string so it can be processed.
             } else {
-                throw new Exception("can't convert data to String.");
+                throw new Exception("can't convert binary data to String.");
             }
         }
 
@@ -48,7 +48,7 @@ parser.canParse = function (data)
 }
 
 //parser.parse = function (data)
-parser.parse = function (socket, data)
+parser.parse = function(socket, data)
 {
     if (!_.isString(data)) {
         var strData;

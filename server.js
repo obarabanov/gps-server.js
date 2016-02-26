@@ -95,46 +95,40 @@ var tcp = net.createServer( function(socket) {
         log.info( 'TCP got data from ' + client );
         //log.info( 'TCP got data on socket: ' + socket ); // TODO: debug socket.IMEI value
         //log.info( 'TCP got data on socket: ' + JSON.stringify( socket.address() ) );
+
         logInput.info( '' + data ); // saving input -> into a file.
 
         //log.debug( 'data instanceof Buffer ? ' + (data instanceof Buffer) );
         //log.debug( 'is data of String type ? ' + _.isString(data) );
-
-        /*
-         TODO:
-         parser adapters support
-         detect input type data
-         */
 
         //  process data packet
         var parsedData = parser.parse(socket, data); // (data instanceof Buffer) == true
         //log.debug( 'parsed data:\n' + parsedData); //TODO: stringify parsed results.
 
         if (!parsedData) {	//	null || undefined
-            log.error( "Data wasn't parsed. Procession stopped." );
-            //  release socket resources
-            socket.destroy();
+            log.error( "Data wasn't parsed. Connection dropped." );
+            socket.destroy(); //  release socket resources
             return;
         }
 
-        //  TODO:   push return types & socket handlings down, under -> parser ?
-
-        if (_.isString(parsedData) && (parsedData == 'connection initialized')) {
-            log.info('Socket connection initialized. Waiting for data from device.');
-            return;
-        }
-
-        var parsedMaps;
-        if (_.isArray(parsedData)) {
+        var parsedMaps; // expected format - Array of Maps with extracted data values.
+        if (_.isArray(parsedData))
+        {
+            if (parsedData.length == 0) { // empty Array
+                log.info('Connection still opened, looking for next data packet.');
+                return;
+            }
             parsedMaps = parsedData;
         }
 
         if (!parsedMaps) {
-            log.error('Wrong parsed data format. Procession stopped.');
-            //  keep connection opened, as there may be additional data ?
+            log.error("Can't process parsed data. Connection dropped." );
+            socket.destroy();
             return;
+            //  TODO:   keep connection opened, as there may be additional data ?
         }
 
+        //  TODO:   put data extraction under try / catch block.
         for (var index in parsedMaps) // this approach is safe, in case parsedMaps == null.
         {
             var mapData = parsedMaps[ index ];
