@@ -29,9 +29,8 @@
         - config and other packets
       - Elgato Ukr
       - Queclink ?
-    - **others ?:**
-      - RCS
-      - Ruptela
+    - **unclear:**
+      - RCS TeleTrack
   - support NMEA format, via existing js module ?
   - unit tests - karma ?
   - stress tests / highload ?
