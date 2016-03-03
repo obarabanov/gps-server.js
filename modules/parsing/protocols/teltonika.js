@@ -1,4 +1,4 @@
-var log = require('../../log')(module);
+﻿var log = require('../../log')(module);
 
 
 // --- BiTrek GPS ------------------------------------------------------------
@@ -83,7 +83,7 @@ parser.parse = function(socket, buffer)
 
     //  type #2 - Data packet:
     if (buffer.length > 12) {
-        return parseDataPacket(socket, data)
+        return parseDataPacket(socket, buffer)
     }
 
     log.info("It's not a Bitrek / Teltonika data packet.");
