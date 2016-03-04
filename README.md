@@ -20,6 +20,17 @@ Main goals are to keep it:
 
 ## How to use
 
+### as standalone server
+
+After cloning or downloading this repository, you can run it as standalone server:
+
+```
+npm install
+node server.js
+```
+
+Usually, it's a good idea to use some helper packages, like `forever`. See `server.js` for some more info.
+
 ### as npm package
 *gps-server* can be used as npm package, in external app.
 In your app's folder, do:
@@ -36,16 +47,6 @@ gpsServer();
 ```
 
 See `server.js` for usage example.
-
-
-
-### as standalone server
-
-After cloning or downloading this repository, you can run it as standalone server:
-
-`node server.js`
-
-Usually, it's a good idea to use some helper packages, like `forever`. See `server.js` for some more info.
 
 
 ## Functionality and Features
