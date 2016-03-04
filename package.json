@@ -1,6 +1,6 @@
 {
   "name": "gps-server",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "server supporting hardware GPS devices of various types",
   "main": "./gps-server.js",
   "keywords": [
@@ -30,7 +30,7 @@
     "socket.io": "^1.3.5",
     "underscore": "^1.8.3",
     "bower": "^1.3.1",
-    "winston": "*"
+    "winston": "1.0.1"
   },
   "devDependencies": {},
   "scripts": {
