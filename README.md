@@ -32,6 +32,7 @@
     - **unclear:**
       - RCS TeleTrack
   - support NMEA format, via existing js module ?
+  - introduce 'extension point' to use parsed data
   - unit tests - karma ?
   - stress tests / highload ?
   - support for demo mobile app

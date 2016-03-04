@@ -97,7 +97,7 @@ var tcp = net.createServer( function(socket) {
         //log.info( 'TCP got data on socket: ' + JSON.stringify( socket.address() ) );
 
         try {
-            //  TODO:   data encoding ?
+            //  TODO:   data encoding ? convert binary -> hex (bytes)
             logInput.info( '' + data ); // saving input -> into a file.
         } catch(ex) {
             log.error('file logging failure: ' + ex);
@@ -133,9 +133,15 @@ var tcp = net.createServer( function(socket) {
             //  TODO:   keep connection opened, as there may be additional data ?
         }
 
+        //  TODO:   introduce 'extension point' - announce data map via event ?
+
         //  TODO:   put data extraction under try / catch block.
         for (var index in parsedMaps) // this approach is safe, in case parsedMaps == null.
         {
+
+            //  TODO:   batch mode: update UI only for LAST position (of last array value)
+            //  TODO:   batch mode: update DB in batch mode - all-at-once, instead of per-array-value approach.
+
             var mapData = parsedMaps[ index ];
             var deviceId = mapData['IMEI'];
 

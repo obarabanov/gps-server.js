@@ -6,6 +6,8 @@ var teltonika = require('./protocols/teltonika');
 var parser = {};
 module.exports = parser;
 
+//TODO: unify protocols usage, like:  parser.registerProtocol( protocolModule, priority, ... )
+
 var protocols = [globalsat, teltonika]; //TODO: add more protocol modules here
 /*
 //  Definition with protocol providers with priorities.
