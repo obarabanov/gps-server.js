@@ -1,7 +1,8 @@
 {
   "name": "gps-server",
-  "version": "0.0.2",
+  "version": "0.3.0",
   "description": "server supporting hardware GPS devices of various types",
+  "main": "./gps-server.js",
   "keywords": [
     "gps",
     "server",
@@ -33,7 +34,6 @@
   },
   "devDependencies": {},
   "scripts": {
-    "postinstall": "bower install",
-    "prestart": "npm install"
+    "postinstall": "bower install"
   }
 }
