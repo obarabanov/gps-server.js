@@ -3,7 +3,6 @@ node_modules/
 bower_components/
 /nbproject/private/
 .idea/
-/temp/
-logs/*
 *.log
+input.log*
 

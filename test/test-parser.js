@@ -1,23 +1,25 @@
 var assert = require('assert');
-var parser = require('../modules/parser');
+var parser = require('../modules/parsing/parser');
 
 var data;
 
 data = 'dsfklghkdshj'
-assert.equal( undefined, parser.detectVendor( data ) );
-assert.notEqual( 'GlobalSat', parser.detectVendor( data ) );
+assert.equal( undefined, parser.recognizePacketType( data ) );
+assert.notEqual( 'GlobalSat', parser.recognizePacketType( data ) );
 
 data = '----dgfkdgf--!'
-assert.equal( 'GlobalSat', parser.detectVendor( data ) );
+assert.equal( 'GlobalSat', parser.recognizePacketType( data ) );
 
-data = new Number( 55 );
-//assert.ifError( parser.detectVendor( data ) );
+//data = new Number( 55 );
+//assert.ifError( parser.recognizePacketType( data ) );
+/*
 try {
     assert.equal( 'some_vendor', parser.isProperInput( data ) );
 } catch (e) {
     console.error('Catched in test: ' + e);
 }
-assert.equal( undefined, parser.detectVendor( data ) );
+*/
+//assert.equal( undefined, parser.recognizePacketType( data ) );
 
 var packets;
 data ='GSr,354660042226111,00,4,c000,c000,3,290813,231939,E03407.9321,N4426.5012,31,0.00,0,6,1.8,12650,12620mV,0,0,0,0,0,21046,0,255,01,5DE0,2BA4*62!';

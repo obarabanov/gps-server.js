@@ -1,10 +1,16 @@
 {
   "name": "gps-server",
-  "version": "0.0.1",
+  "version": "0.3.3",
   "description": "server supporting hardware GPS devices of various types",
+  "main": "./gps-server.js",
   "keywords": [
     "gps",
     "server",
+    "global",
+    "positioning",
+    "system",
+    "tracking",
+    "tracker",
     "geospatial",
     "spatial"
   ],
@@ -23,16 +29,11 @@
     "nconf": "*",
     "socket.io": "^1.3.5",
     "underscore": "^1.8.3",
-    "winston": "*"
+    "bower": "^1.3.1",
+    "winston": "1.0.1"
   },
-  "devDependencies": {
-    "bower": "^1.3.1"
-  },
+  "devDependencies": {},
   "scripts": {
-    "postinstall": "bower install",
-    "prestart": "npm install"
-  },
-  "engines": {
-    "node": "*"
+    "postinstall": "bower install"
   }
 }
