@@ -102,9 +102,8 @@ See `server.js` for usage example.
 - **remove:**
   - <s>remove: saving into DB
   - <s>remove: chat.html (socket.io demo)
-  - remove: /libs dependencies
-  - remove: bower usage and  dependencies ?
+  - <s>remove: bower usage, re-arrange dependencies
 - **configuration:**
-  - setup project through the package.json
-  - arrange npm "scripts"
+  - <s>setup project through the package.json
+  - <s>arrange npm "scripts"
   - extend configuration support

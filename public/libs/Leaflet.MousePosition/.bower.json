@@ -1,0 +1,13 @@
+{
+  "name": "Leaflet.MousePosition",
+  "homepage": "https://github.com/ardhi/Leaflet.MousePosition",
+  "_release": "c32f1c84ec",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "c32f1c84ec49dbf7ad599c51c8659d5e08af0f97"
+  },
+  "_source": "git://github.com/ardhi/Leaflet.MousePosition.git",
+  "_target": "*",
+  "_originalSource": "ardhi/Leaflet.MousePosition"
+}

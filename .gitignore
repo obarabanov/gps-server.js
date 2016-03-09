@@ -1,6 +1,5 @@
 !.gitkeep
 node_modules/
-bower_components/
 /nbproject/private/
 .idea/
 *.log
