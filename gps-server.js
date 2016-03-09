@@ -6,7 +6,6 @@ var io = require('socket.io')(http);
 var net = require('net');
 var _ = require('underscore');
 
-//var logger = require('morgan');
 var log = require('./modules/log')(module);
 var logInput = require('./modules/logInput')(module);
 var config = require('./modules/config');
@@ -15,11 +14,8 @@ var parser = require('./modules/parsing/parser');
 module.exports = function() {
 
 //  =========   Express endpoints
-    //app.use(logger('dev')); // выводим все запросы со статусами в консоль
-    app.use(express.static('public'));
-
+    app.use(express.static(__dirname + '/public'));//must be absolute path to the directory with static resources, to work correctly in both modes: as standalone app and as npm_module.
     app.get('/', function (req, res) {
-        //res.send('<h1>Hello world</h1>');
         res.sendFile(__dirname + '/public/map.html'); // NOTE: but index.html always has priority, and rendered instead..
     });
 
