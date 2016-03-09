@@ -78,11 +78,11 @@ See `server.js` for usage example.
 - **add:**
   - arrange universal parsing flow using adapters (parsers for specific formats ?)
     - **binary:**
-      - <s>BiTrek
-      - <s>Teltonika
+      - ~~BiTrek~~
+      - ~~Teltonika~~
     - **string (NMEA ?) format:**
       - GlobalSat:
-        - <s>reports: GSr
+        - ~~reports: GSr~~
         - config and other packets
       - Elgato Ukr
       - Queclink ?
@@ -100,10 +100,10 @@ See `server.js` for usage example.
     - page with current / active metrics (# of connected devices and/or UI users)
     - log page (events/usage listing), with e.g. ~1,000 lines max
 - **remove:**
-  - <s>remove: saving into DB
-  - <s>remove: chat.html (socket.io demo)
-  - <s>remove: bower usage, re-arrange dependencies
+  - ~~remove: saving into DB~~
+  - ~~remove: chat.html (socket.io demo)~~
+  - ~~remove: bower usage, re-arrange dependencies~~
 - **configuration:**
-  - <s>setup project through the package.json
-  - <s>arrange npm "scripts"
+  - ~~setup project through the package.json~~
+  - ~~arrange npm "scripts"~~
   - extend configuration support
