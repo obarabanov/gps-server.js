@@ -55,20 +55,20 @@ module.exports = function() {
 //  =========   HTTP
     var portHttp = config.get('http:port');
     http.listen(portHttp, function () {
-        log.info('HTTP listening on *:' + portHttp);
+        var serverAddress = http.address();
+        log.info('HTTP listening on ' + serverAddress.family + ' ' + serverAddress.address + ':' + serverAddress.port + ' - UI is available in browser'); // TODO: put 'UI disabled' if config.ui.disabled
     });
 
 //  TODO    extend TCP configuration with ENV & default value
 //  TODO    config TCP in RH cloud, on the same 8080 port ?
 //  =========   TCP
+    var tcpInputEncoding = config.get('tcp:data_input_encoding') || 'ascii';
+    log.debug( 'tcp_input_encoding: ' + tcpInputEncoding);
     var portTcp = config.get('tcp:port'); // 8888
     var tcp = net.createServer(function (socket) {
 
         var client = 'host ' + socket.remoteAddress + ':' + socket.remotePort;
         log.info('TCP connected ' + client);
-
-        //	don't convert, data should be kept as Buffer (binary).
-        //socket.setEncoding('utf8'); // to convert Buffer -> String
 
         tcp.getConnections(function (err, count) {
             if (err) {
@@ -85,26 +85,22 @@ module.exports = function() {
         /**
          * Procession of received data.
          *
-         * @param {Buffer} data - raw binary data of Buffer type.
+         * @param {Buffer} buffer - raw binary data of Buffer type.
          */
-        socket.on('data', function (data) {
-            //log.info( 'tcp ' + client + '  passed data:\n' + data );
+        socket.on('data', function (buffer) {
+            //log.info( 'tcp ' + client + '  passed data:\n' + buffer );
             log.info('TCP got data from ' + client);
             //log.info( 'TCP got data on socket: ' + socket ); // TODO: debug socket.IMEI value
             //log.info( 'TCP got data on socket: ' + JSON.stringify( socket.address() ) );
 
             try {
-                //  TODO:   data encoding ? convert binary -> hex (bytes)
-                logInput.info('' + data); // saving input -> into a file.
+                logInput.info( buffer.toString( tcpInputEncoding ) ); // saving data input -> into a file.
             } catch (ex) {
                 log.error('file logging failure: ' + ex);
             }
 
-            //log.debug( 'data instanceof Buffer ? ' + (data instanceof Buffer) );
-            //log.debug( 'is data of String type ? ' + _.isString(data) );
-
             //  process data packet
-            var parsedData = parser.parse(socket, data); // (data instanceof Buffer) == true
+            var parsedData = parser.parse(socket, buffer); // (buffer instanceof Buffer) == true
             //log.debug( 'parsed data:\n' + parsedData); //TODO: stringify parsed results.
 
             if (!parsedData) {	//	null || undefined
@@ -175,7 +171,6 @@ module.exports = function() {
 
             //  data packet fully processed.
             socket.end();
-
         });
 
         socket.on('close', function () {
@@ -199,7 +194,8 @@ module.exports = function() {
          */
 
     }).listen(portTcp, function () {
-        log.info('TCP  listening on *:' + portTcp);
+        var serverAddress = tcp.address();
+        log.info('TCP  listening on ' + serverAddress.family + ' ' + serverAddress.address + ':' + serverAddress.port);
     });
 
 }
