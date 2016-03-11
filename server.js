@@ -16,13 +16,13 @@ eventEmitter.on('gps_data', function(data) {
     //console.log('this happens synchronously');
     //  preferably, handle data asynchronously, to not affect on gps-server
     setImmediate(function(data) {
-        console.log('EVENT async "gps_data" : ');
+        //console.log('EVENT async "gps_data" : ');
     }, data);
 });
 
 eventEmitter.on('gps_data_tcp', function(data) {
     setImmediate(function(data) {
-        console.log('EVENT async "gps_data_tcp" : ');
+        //console.log('EVENT async "gps_data_tcp" : ');
     }, data);
 });
 
