@@ -20,7 +20,7 @@ function getLogger(module) {
                 json:       false,
                 //dirname: ,
                 filename:   __dirname + '/../logs/input.log', // TODO:  make /logs directory configurable.
-                datePattern:'.yyyy-MM',
+                //datePattern:'.yyyy-MM', // rotating log monthly
                 level:      'info',
                 
                 formatter: function (options) {
