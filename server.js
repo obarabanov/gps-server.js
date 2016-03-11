@@ -9,5 +9,26 @@
  */
 var gpsServer = require('./gps-server');
 
-//  start GPS server
-gpsServer();
+var eventEmitter = gpsServer(); //  start GPS server
+
+//  handle data processed and returned by gps-server
+eventEmitter.on('gps_data', function(data) {
+    //console.log('this happens synchronously');
+    //  preferably, handle data asynchronously, to not affect on gps-server
+    setImmediate(function(data) {
+        console.log('EVENT async "gps_data" : ');
+    }, data);
+});
+
+eventEmitter.on('gps_data_tcp', function(data) {
+    setImmediate(function(data) {
+        console.log('EVENT async "gps_data_tcp" : ');
+    }, data);
+});
+
+/*
+//  TBD
+eventEmitter.on('gps_data_http', function(data) {
+    console.log('EVENT "gps_data_http" : ' + data);
+});
+*/

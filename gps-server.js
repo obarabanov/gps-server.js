@@ -5,13 +5,21 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var net = require('net');
 var _ = require('underscore');
+var events = require('events');
 
 var log = require('./modules/log')(module);
 var logInput = require('./modules/logInput')(module);
 var config = require('./modules/config');
 var parser = require('./modules/parsing/parser');
 
+/**
+ * Function to run gps-server outside.
+ *
+ * @returns {events.EventEmitter} provides 'extension point' for handling GPS data outside.
+ */
 module.exports = function() {
+
+    var em = new events.EventEmitter();
 
 //  =========   Express endpoints
     app.use(express.static(__dirname + '/public'));//must be absolute path to the directory with static resources, to work correctly in both modes: as standalone app and as npm_module.
@@ -125,52 +133,56 @@ module.exports = function() {
                 //  TODO:   keep connection opened, as there may be additional data ?
             }
 
-            //  TODO:   introduce 'extension point' - announce data map via event ?
+            //  data packet fully processed.
+            //  release socket asap.
+            socket.end();
 
-            //  TODO:   put data extraction under try / catch block.
-            for (var index in parsedMaps) // this approach is safe, in case parsedMaps == null.
-            {
+            try {
+                //  TODO:   use 'ui:enabled' config option
+                //  update UI in real-time
+                for (var index = 0; index < parsedMaps.length; index++)
+                {
+                    var mapData = parsedMaps[index];
+                    var deviceId = mapData['IMEI'];
 
-                //  TODO:   batch mode: update UI only for LAST position (of last array value)
-                //  TODO:   batch mode: update DB in batch mode - all-at-once, instead of per-array-value approach.
+                    if (deviceId) {
+                        //  utcDate,utcTime
+                        var utcDateTime = mapData['utcDateTime'];
+                        //var utcDate = mapData['utcDate'];
+                        //var utcTime = mapData['utcTime'];
+                        //var utcDate = new Date(mapData['utcDate']);
+                        //var utcTime = new Date(mapData['utcTime']);
+                        //var utcDateTime = new Date(parseInt(mapData['utcDate']) + parseInt(mapData['utcTime']));
+                        //log.debug('date: ' + utcDate + ' time: ' + utcTime);
+                        //log.debug('date & time as Date: ' + utcDateTime); // OUTPUT: date & time as Date: 1377818379000
+                        //log.debug('date&time as String: ' + utcDateTime.toString()); // the same !
 
-                var mapData = parsedMaps[index];
-                var deviceId = mapData['IMEI'];
+                        var lat = mapData['latitude'];
+                        var lng = mapData['longitude'];
 
-                if (deviceId) {
-                    //  utcDate,utcTime
-                    var utcDateTime = mapData['utcDateTime'];
-                    //var utcDate = mapData['utcDate'];
-                    //var utcTime = mapData['utcTime'];
-                    //var utcDate = new Date(mapData['utcDate']);
-                    //var utcTime = new Date(mapData['utcTime']);
-                    //var utcDateTime = new Date(parseInt(mapData['utcDate']) + parseInt(mapData['utcTime']));
-                    //log.debug('date: ' + utcDate + ' time: ' + utcTime);
-                    //log.debug('date & time as Date: ' + utcDateTime); // OUTPUT: date & time as Date: 1377818379000
-                    //log.debug('date&time as String: ' + utcDateTime.toString()); // the same !
-
-                    var lat = mapData['latitude'];
-                    var lng = mapData['longitude'];
-
-                    var objUI = {
-                        type: 'marker',
-                        deviceId: deviceId,
-                        utcDateTime: new Date(utcDateTime).toUTCString(),
-                        altitude: mapData['altitude'], // Unit: meter
-                        speed: mapData['speed'], // unit: km/hr
-                        //speedKnots: mapData['speedKnots'], // unit: Knots
-                        heading: mapData['heading'], // unit: degree
-                        //reportType: mapData['reportType'], - see: tr-600_development_document_v0_7.pdf -> //4=Motion mode static report //5 = Motion mode moving report //I=SOS alarm report //j= ACC report
-                        lat: lat,
-                        lng: lng
-                    };
-                    io.emit('map message', objUI); // broadcasting using 'emit' to every socket.io client
-                    log.debug('gps position broadcasted -> map UI');
+                        var objUI = {
+                            type: 'marker',
+                            deviceId: deviceId,
+                            utcDateTime: new Date(utcDateTime).toUTCString(),
+                            altitude: mapData['altitude'], // Unit: meter
+                            speed: mapData['speed'], // unit: km/hr
+                            //speedKnots: mapData['speedKnots'], // unit: Knots
+                            heading: mapData['heading'], // unit: degree
+                            //reportType: mapData['reportType'], - see: tr-600_development_document_v0_7.pdf -> //4=Motion mode static report //5 = Motion mode moving report //I=SOS alarm report //j= ACC report
+                            lat: lat,
+                            lng: lng
+                        };
+                        io.emit('map message', objUI); // broadcasting using 'emit' to every socket.io client
+                        log.debug('gps position broadcasted -> map UI');
+                    }
                 }
+            } catch (ex) {
+                log.error('UI update failure: ' + ex);
             }
 
-            //  data packet fully processed.
-            socket.end();
+            //  announce GPS data events, as part of 'extension point' to be used outside
+            em.emit('gps_data', parsedMaps);
+            em.emit('gps_data_tcp', parsedMaps);
         });
 
         socket.on('close', function () {
@@ -181,21 +193,11 @@ module.exports = function() {
             log.error('TCP: ', err);
         });
 
-        /*
-         socket.on('connect', function() {
-         var hex = 0x01;
-         var buff = new Buffer( 1);
-         buff.writeUInt8(hex, 0);
-
-         socket.write( buff, function() {
-         console.log( buff, 'flushed');
-         });
-         });
-         */
-
     }).listen(portTcp, function () {
         var serverAddress = tcp.address();
         log.info('TCP  listening on ' + serverAddress.family + ' ' + serverAddress.address + ':' + serverAddress.port);
     });
+
+    return em; // instance of EventEmitter, to use it outside.
 
 }
