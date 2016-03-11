@@ -57,7 +57,7 @@ like saving into DB or custom UI rendering:
 eventEmitter.on('gps_data', function(data) {
     //  preferably, handle data asynchronously, to not affect on gps-server
     setImmediate(function(data) {
-        console.log('EVENT async "gps_data" : ' + data.lenght);
+        console.log('EVENT async "gps_data" : ' + data.length);
         //  save into DB logic goes here
     }, data);
 });
@@ -110,7 +110,7 @@ See `server.js` for usage example.
     - **unclear:**
       - RCS TeleTrack
   - support NMEA format, via existing js module ?
-  - introduce 'extension point' to use parsed data
+  - ~~introduce 'extension point' to use parsed data~~
   - unit tests - karma ?
   - stress tests / highload ?
   - support for demo mobile app
