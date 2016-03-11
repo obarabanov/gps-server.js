@@ -46,10 +46,31 @@ var gpsServer = require('gps-server');
 gpsServer();
 ```
 
+### handling GPS data
+
+After GPS data processed and parsed successfully, they are announced along with `gps_data` events and available for outside usage.
+It's kinda of "extension point" where custom data-manipulation logic can be placed,
+like saving into DB or custom UI rendering:
+
+```
+//  handle data processed and returned by gps-server
+eventEmitter.on('gps_data', function(data) {
+    //  preferably, handle data asynchronously, to not affect on gps-server
+    setImmediate(function(data) {
+        console.log('EVENT async "gps_data" : ' + data.lenght);
+        //  save into DB logic goes here
+    }, data);
+});
+```
+
 See `server.js` for usage example.
 
 
 ## Functionality and Features
+
+### @0.4.0
+
+- *gps-server* announces `gps_data` events to provide ability for outside data-handling
 
 ### @0.3.0
 
