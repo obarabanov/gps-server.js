@@ -70,24 +70,29 @@ module.exports = function() {
 //  TODO    extend TCP configuration with ENV & default value
 //  TODO    config TCP in RH cloud, on the same 8080 port ?
 //  =========   TCP
-    var tcpInputEncoding = config.get('tcp:data_input_encoding') || 'ascii';
-    log.debug( 'tcp_input_encoding: ' + tcpInputEncoding);
-    var portTcp = config.get('tcp:port'); // 8888
+    var tcpInputEncoding = config.get('tcp:input_log_encoding') || 'ascii';
+    log.debug('TCP config: input_log_encoding: ' + tcpInputEncoding);
+    var tcpIdleTimeout = config.get('tcp:idle_timeout') || 30000; // 30 secs if other not configured
+    log.debug('TCP config: idle_timeout: ' + tcpIdleTimeout);
+    var portTcp = config.get('tcp:port');
     var tcp = net.createServer(function (socket) {
 
         var client = 'host ' + socket.remoteAddress + ':' + socket.remotePort;
         log.info('TCP connected ' + client);
 
+        // releasing idling resources
+        socket.setTimeout(tcpIdleTimeout, function () {
+            log.debug('TCP socket destroyed after idling for ' + tcpIdleTimeout + ' millis');
+            socket.destroy();
+        });
+
         tcp.getConnections(function (err, count) {
             if (err) {
-                //console.log('ERROR of counting active TCP connections');
-                //log.error('Internal error(%d): %s',res.statusCode,err.message);
-                log.error('ERROR of counting active TCP connections');
+                log.error('ERROR on counting active TCP connections');
                 return;
             }
             //server.maxConnections # Set this property to reject connections when the server's connection count gets high.
-            //console.log('TCP active connections: ' + count );// + ' of max: ' + tcp.maxConnections); // undefined
-            log.info('TCP active connections: ' + count);
+            log.info('TCP active connections: ' + count);// + ' of max: ' + tcp.maxConnections); // undefined
         });
 
         /**
@@ -129,8 +134,7 @@ module.exports = function() {
             if (!parsedMaps) {
                 log.error("Can't process parsed data. Connection dropped.");
                 socket.destroy();
-                return;
-                //  TODO:   keep connection opened, as there may be additional data ?
+                return;                //  TODO:   keep connection opened, as there may be additional data ?
             }
 
             //  data packet fully processed.

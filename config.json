@@ -1,7 +1,8 @@
 {
   "tcp": {
     "port": 6100,
-    "data_input_encoding": "ascii"
+    "input_log_encoding": "ascii",
+    "idle_timeout": 60000
   },
   "http": {
     "port": 6101
