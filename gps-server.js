@@ -139,7 +139,9 @@ module.exports = function() {
 
             try {
                 //  TODO:   use 'ui:enabled' config option
+
                 //  update UI in real-time
+                //  TODO:   don't pass EVERY of coords to UI, but only LAST / LATEST one.
                 for (var index = 0; index < parsedMaps.length; index++)
                 {
                     var mapData = parsedMaps[index];
