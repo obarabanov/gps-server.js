@@ -1,14 +1,14 @@
 var _ = require('underscore');
 var log = require('../log')(module);
 var globalsat = require('./protocols/globalsat');
-var teltonika = require('./protocols/teltonika');
+var bitrek = require('./protocols/bitrek');
 
 var parser = {};
 module.exports = parser;
 
 //TODO: unify protocols usage, like:  parser.registerProtocol( protocolModule, priority, ... )
 
-var protocols = [globalsat, teltonika]; //TODO: add more protocol modules here
+var protocols = [globalsat, bitrek]; //TODO: add more protocol modules here
 /*
 //  Definition with protocol providers with priorities.
 //  Parser can run every provider.canParse() method,
@@ -20,7 +20,7 @@ var protocols = [globalsat, teltonika]; //TODO: add more protocol modules here
 var protocols = [
     {provider: globalsat, priority: 10},
     {provider: nmea, priority: 0},
-    {provider: teltonika, priority: 1}
+    {provider: bitrek, priority: 1}
 ];
 */
 
@@ -100,13 +100,13 @@ parser.parse = function (socket, buffer)
 
         case 'init session packet':
             //  TODO    error-handling - notify device & deny session, if there is an error.
-            socket.IMEI = teltonika.parseIMEI(strData); // keep device's IMEI (ID) in socket connection
+            socket.IMEI = bitrek.parseIMEI(strData); // keep device's IMEI (ID) in socket connection
             //socket.write(0); // reply '0' to deny session.
             socket.write(String.fromCharCode(0x01)); // reply '1' to device, to keep buffer connection opened and get further data.
             return 'connection initialized';
 
-        case 'Teltonika':
-            return teltonika.parse(socket, buffer);
+        case 'Bitrek':
+            return bitrek.parse(socket, buffer);
 
         default:
             log.error("Unsupported data packet's format: "+ packetType +" Procession cancelled.");
@@ -132,7 +132,7 @@ parser.recognizePacketType = function (data)
         return 'GlobalSat';
 
     } else if (data.length > 17) {
-        return 'Teltonika';
+        return 'Bitrek';
     }
 
     return undefined;

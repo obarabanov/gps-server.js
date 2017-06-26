@@ -14,7 +14,7 @@ module.exports = parser;
  */
 parser.canParse = function(buffer)
 {
-    log.debug('teltonika.canParse():');
+    log.debug('bitrek.canParse():');
 
     if (!Buffer.isBuffer(buffer)) {
         log.error("Data packet is not of Buffer type.");
@@ -86,7 +86,7 @@ parser.parse = function(socket, buffer)
         return parseDataPacket(socket, buffer)
     }
 
-    log.info("It's not a Bitrek / Teltonika data packet.");
+    log.info("It's not a Bitrek data packet.");
     return null;
 }
 
@@ -122,7 +122,7 @@ function parseDataPacket(socket, data)
         return;
     }
 
-	log.info('Start parsing data in Teltonika format, for IMEI: ' + socket.device_imei);
+	log.info('Start parsing data in Bitrek format, for IMEI: ' + socket.device_imei);
 
     var buf;
 	if (data instanceof Buffer) {
@@ -135,7 +135,7 @@ function parseDataPacket(socket, data)
 
     var sizeAVL = bytesToInt(buf, 4, 4);
     var rCRC = bytesToInt(buf, buf.length - 4, 4);
-    var cCRC = crc16_teltonika(buf, 8, sizeAVL);
+    var cCRC = crc16(buf, 8, sizeAVL);
 
 	console.log( buf, buf[ buf.length -4], buf[ buf.length -3], buf[ buf.length -2], buf[ buf.length -1]);
 	console.log( sizeAVL, buf.length -4*3);
@@ -397,7 +397,7 @@ function parseDataPacket(socket, data)
     return null;
 };
 
-function crc16_teltonika(data, p, size)
+function crc16(data, p, size)
 {
     var crc16_result = 0x0000;
     for (var i = p; i < p + size; i++)

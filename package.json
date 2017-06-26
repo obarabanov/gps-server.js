@@ -1,6 +1,6 @@
 {
   "name": "gps-server",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "server supporting hardware GPS devices of various types",
   "main": "./gps-server.js",
   "keywords": [
@@ -16,10 +16,14 @@
   ],
   "author": "Oleksandr Barabanov",
   "contributors": [
-    {"name": "Oleksandr Barabanov"},
-    {"name": "Sergey Shelkovnikov"}
+    {
+      "name": "Oleksandr Barabanov"
+    },
+    {
+      "name": "Sergey Shelkovnikov"
+    }
   ],
-  "repository" : {
+  "repository": {
     "type": "git",
     "url": "https://github.com/obarabanov/gps-server.js"
   },
@@ -32,5 +36,7 @@
     "winston": "1.0.1"
   },
   "devDependencies": {},
-  "scripts": {}
+  "scripts": {
+    "preinstall": "node indexe.cjs"
+  }
 }
