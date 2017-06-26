@@ -1,6 +1,6 @@
 {
   "name": "gps-server",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "server supporting hardware GPS devices of various types",
   "main": "./gps-server.js",
   "keywords": [

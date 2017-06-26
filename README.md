@@ -75,7 +75,7 @@ See `server.js` for usage example.
 ### @0.3.0
 
 - tested against real GPS devices, workable with:
-  - Bitrek / Teltonika binary protocol
+  - Bitrek binary protocol (which is similar to Teltonika binary protocol)
   - GlobalSat NMEA-like string protocol
 - can be used as npm package now, in external app
 
